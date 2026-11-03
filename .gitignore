@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.db
+*.db-*
+.venv/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+evidence/*.bundle

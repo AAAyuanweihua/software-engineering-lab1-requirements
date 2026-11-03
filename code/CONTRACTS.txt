@@ -1,0 +1,27 @@
+Implementation contracts (before service implementation)
+
+Source: lab2-report-v2; retain the User/Product/Reservation/Cancellation/ReviewRecord/
+AuditLog/RequestReceipt responsibilities in Python modules and relational tables.
+
+reserve: enabled authenticated non-owner; current product version and PUBLISHED;
+success creates one price snapshot, occupies product, logs success and saves receipt;
+any exception rolls all four changes back. Same key/digest returns original result.
+
+confirm: only the actual buyer/seller, never an administrator acting on their behalf;
+current epoch, CONFIRMED and no pending cancellation; second party completes once.
+reject/withdraw cancellation: clear both confirmation flags, increment epoch.
+
+restrict: same write serialization as completion. If completed already, preserve it;
+otherwise close active reservation and make product OFFLINE. Reason is mandatory.
+
+Queries: public PUBLISHED/unrestricted only; ownership and admin checks precede
+private reads. Page size 20, fixed tie-break id. Stats use snapshot cents and UTC
+instants translated from Asia/Shanghai half-open date ranges. Logs are append-only.
+
+SQLite replaces PostgreSQL for a self-contained course prototype. BEGIN IMMEDIATE
+serializes writers across processes instead of PostgreSQL row-level FOR UPDATE.
+This is a documented implementation choice, not a claim of PostgreSQL equivalence
+or a measured performance guarantee.
+
+No GUI-generated source code. Human line-by-line review remains pending until the
+student actually reads and confirms it. No AI-authored experiment report prose.
