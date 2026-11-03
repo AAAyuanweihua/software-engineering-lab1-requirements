@@ -15,3 +15,13 @@ findings. Its text and independently re-executed probes are archived under
 review-2026-11-03. This updates the earlier stage's review situation; it is not
 an acceptance of the subsequently changed 0.1.1 source. Final human acceptance
 of these repairs and the student's independently written report remain pending.
+
+Acceptance update (2026-11-04, Asia/Shanghai):
+Student exact reply: 已验收
+Accepted source baseline: 0573fd073b5015aaca27ba933d1cdc3e6481644c
+Existing immutable tag: lab3-v0.1.1-r1 (campus-market-lab3 0.1.1).
+This records the student's acceptance of the repaired version following the
+39-test/build/install/demo evidence. It supersedes the pending acceptance status
+above. The student did not describe additional manual steps or a precise time;
+none are inferred. This is not a new claim of line-by-line reading or new tests.
+The independently written experiment report remains outside this package.

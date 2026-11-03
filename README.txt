@@ -15,13 +15,16 @@ https://github.com/AAAyuanweihua/software-engineering-lab1-requirements/tree/lab
 构建与运行结果以evidence/build.json和各阶段原始.txt为准。应用源码规模以
 evidence/source_metrics.json为准，不包含测试、构建工具、UML或GUI生成代码。
 
-尚待学生完成：逐行阅读采用的代码，独立撰写实验报告正文，将本人报告导出PDF后
-再组装正式提交包。当前代码与证据包没有实验报告.pdf，不是完整课程提交包。
+当前验收状态：2026年11月4日，王陈钰回复“已验收”，确认采用修复后的
+lab3-v0.1.1-r1版本。完整原话及对应提交见evidence/HUMAN_ACCEPTANCE.json。
+该答复未进一步说明逐行阅读情况或新增手工测试步骤，记录中不作推断。
+尚待学生独立撰写实验报告正文，将本人报告导出PDF后再组装正式提交包。
+当前代码与证据包没有实验报告.pdf，不是完整课程提交包。
 本说明是软件操作文档，不应复制为本人实验报告。
 
 0.1.1更新：收到的0.1.0审查记录及八组基线复现位于
  evidence/review-2026-11-03；修复后的针对性测试在
  code/tests/test_review_regressions.py。旧版lab3-verified标签不移动；
- 新版将使用独立的lab3-v0.1.1标签。本人对修复后代码的验收仍需实际进行。
+ 修复版保留独立的lab3-v0.1.1及lab3-v0.1.1-r1标签。
 
 最终补充回归：lab3-v0.1.1-r1，原22项加17项审查回归共39项通过；旧标签不移动。

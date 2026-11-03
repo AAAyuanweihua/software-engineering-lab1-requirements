@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-04",
+  "timezone": "Asia/Shanghai",
+  "student": "王陈钰",
+  "student_id": "241220055",
+  "exact_statement": "已验收",
+  "status": "accepted_by_user",
+  "accepted_version": "0.1.1",
+  "accepted_source_tag": "lab3-v0.1.1-r1",
+  "accepted_source_commit": "0573fd073b5015aaca27ba933d1cdc3e6481644c",
+  "scope": "Acceptance of the repaired lab3 version presented in the preceding completion message.",
+  "additional_manual_test_details": "not supplied",
+  "line_by_line_reading": "not additionally stated",
+  "independent_experiment_report": "pending; not included in this source/evidence package"
+}

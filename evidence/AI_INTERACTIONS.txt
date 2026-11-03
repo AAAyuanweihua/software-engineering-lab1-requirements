@@ -73,3 +73,14 @@ The supplied review is evidence, not proof that all future changes were personal
 reviewed. No experiment report prose is generated; this is a technical change log.
 
 Additional R05 verification: added deterministic equal-price id ordering and explicit cross-request pagination-change semantics. The final complete suite has 22 original plus 17 regression tests, 39 total, followed by a fresh 0.1.1 wheel build/install/demo.
+
+Stage 6 — student acceptance record (2026-11-04, Asia/Shanghai)
+Student exact reply: 已验收
+Context: acceptance of repaired 0.1.1 at lab3-v0.1.1-r1, source commit
+0573fd073b5015aaca27ba933d1cdc3e6481644c, after the supplied review and
+39-test/build/install/demo evidence. AI action: record this statement, update
+current acceptance metadata and README, commit it separately, and synchronize
+the authorized public lab3 branch and source/evidence ZIP. No application source
+or previous tags are changed. No extra review procedure, exact review time,
+line-by-line reading or new test execution is attributed to the student.
+No experiment-report prose is generated; independent report writing is pending.

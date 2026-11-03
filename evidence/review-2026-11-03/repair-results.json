@@ -80,6 +80,6 @@
     }
   ],
   "full_build_install_demo": "PASS",
-  "human_acceptance_of_fixed_revision": "pending",
+  "human_acceptance_of_fixed_revision": "accepted_by_user on 2026-11-04; see evidence/HUMAN_ACCEPTANCE.json",
   "note": "Original review is preserved. Automated repair evidence is not a human acceptance or an AI-authored experiment report."
 }
