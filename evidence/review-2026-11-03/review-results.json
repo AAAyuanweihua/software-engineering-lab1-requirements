@@ -1,0 +1,173 @@
+{
+  "review_date": "2026-11-03",
+  "started_at": "2026-11-03T21:59:25.327637+08:00",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "sqlite": "3.53.1",
+  "files": [
+    {
+      "file": "src/campus_market/__init__.py",
+      "lines": 3,
+      "sha256": "937dccf05972d11ce8040a418751219768825d0a390e4972f9759f481151ef49"
+    },
+    {
+      "file": "src/campus_market/__main__.py",
+      "lines": 5,
+      "sha256": "d73e60c1018324b7000d9a1adfcc386ae7713d59be557e90fde4bd6d3c171e26"
+    },
+    {
+      "file": "src/campus_market/catalog.py",
+      "lines": 183,
+      "sha256": "07563a1a47b28be60c529971d5c4f5ca7312b8c49773c559ece20a24e4ee6694"
+    },
+    {
+      "file": "src/campus_market/cli.py",
+      "lines": 162,
+      "sha256": "5679ae05464f13307428fbb8ea410e8bb1437db44b1dde26308d19db1868f002"
+    },
+    {
+      "file": "src/campus_market/core.py",
+      "lines": 234,
+      "sha256": "3b8c310515ffa2fb970a6a7d461f0aed4d780010b74dd728f7309a12c53ab52a"
+    },
+    {
+      "file": "src/campus_market/database.py",
+      "lines": 97,
+      "sha256": "b1447afafe18c41d97ca50bdf851cd7004346ca55198968061ba44d132252124"
+    },
+    {
+      "file": "src/campus_market/demo.py",
+      "lines": 76,
+      "sha256": "0e03b43835923cff5f77c30d542ebdddab50723228c548d46f3b38ce3e40385e"
+    },
+    {
+      "file": "src/campus_market/models.py",
+      "lines": 89,
+      "sha256": "da4d52655187622957de5dae289ea50e4d01ab2dc263267f4fc719ab1e0eeffa"
+    },
+    {
+      "file": "src/campus_market/queries.py",
+      "lines": 202,
+      "sha256": "708b430c5a79af33ca340b133a9e973f08d9cbdfbd0619ca3f15ac50f3ea418a"
+    },
+    {
+      "file": "src/campus_market/security.py",
+      "lines": 42,
+      "sha256": "9bb496c6a60eb3e74b6f835b8eecdd71816a7485e52d9024e10b890fb2124d25"
+    },
+    {
+      "file": "src/campus_market/trade.py",
+      "lines": 273,
+      "sha256": "0251b13377d22a9cec4a2d0fe90d2c95edb874e0de0dc17c7c0df5f08c304b62"
+    },
+    {
+      "file": "tests/test_market.py",
+      "lines": 499,
+      "sha256": "b6563b3c4e6eab4c4f2224171a10b8de9e693d58f61ac413a579989b17f02de8"
+    },
+    {
+      "file": "tools/build.py",
+      "lines": 148,
+      "sha256": "d033e6970d7727ec59a3d9695913cf43b465b2ce00ef5fdc31192490f33a828e"
+    },
+    {
+      "file": "tools/metrics.py",
+      "lines": 50,
+      "sha256": "6a9277eefb980860cee71a52f491a1e8b01d7671db5765efac50b0d27b109282"
+    },
+    {
+      "file": "pyproject.toml",
+      "lines": 23,
+      "sha256": "c4ba55dde8e9b364203c5fe27538b1acfa96c715f0348d905a5b359b55b2df16"
+    }
+  ],
+  "baseline_exit_code": 0,
+  "lint_exit_code": 0,
+  "format_exit_code": 0,
+  "probes": [
+    {
+      "id": "R01",
+      "input": {
+        "approve": "false",
+        "accept": "false"
+      },
+      "observed": {
+        "review_status": "PUBLISHED",
+        "reservation_status": "CONFIRMED"
+      }
+    },
+    {
+      "id": "R02",
+      "input": "list_products {\"keyword\":1}",
+      "observed": {
+        "unhandled_exception": "AttributeError",
+        "shell_returned_normally": false
+      }
+    },
+    {
+      "id": "R03",
+      "method": "hold an independent writer; reduce busy timeout to 1ms only for probe",
+      "observed": {
+        "unhandled_exception": "OperationalError",
+        "expected_service_error": "MarketError"
+      }
+    },
+    {
+      "id": "R04",
+      "input": "fault seam raises RuntimeError after reservation insert",
+      "observed": {
+        "exception": "RuntimeError",
+        "reservation_rows": 0,
+        "new_failure_audits": 0
+      }
+    },
+    {
+      "id": "R05",
+      "method": "interleave committed take_down between count and item SELECTs using separate connections",
+      "observed": {
+        "total": 1,
+        "items_count": 0,
+        "page": 1
+      }
+    },
+    {
+      "id": "R06",
+      "input": "restrict a CANCEL_PENDING trade",
+      "observed": {
+        "reservation_status": "CLOSED",
+        "cancellation_status": "CLOSED",
+        "before_snapshot_keys": [
+          "products"
+        ],
+        "after_snapshot_keys": [
+          "products"
+        ],
+        "related_reservation_id_in_log": false,
+        "related_cancellation_id_in_log": false
+      }
+    },
+    {
+      "id": "R07",
+      "input": {
+        "key": null
+      },
+      "observed": {
+        "first_status": "PENDING",
+        "retry_error": "STALE_VERSION",
+        "new_receipts": 0
+      }
+    },
+    {
+      "id": "N01",
+      "input": {
+        "category": " 教材 "
+      },
+      "observed": {
+        "error": "NOT_FOUND"
+      }
+    }
+  ],
+  "finished_at": "2026-11-03T21:59:57.755632+08:00",
+  "source_unchanged": true,
+  "mirror_identical": false
+}

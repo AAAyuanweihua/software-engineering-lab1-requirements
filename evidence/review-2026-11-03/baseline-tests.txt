@@ -1,0 +1,27 @@
+test_audit_permission_filters_and_append_only (test_market.MarketTests.test_audit_permission_filters_and_append_only) ... ok
+test_both_confirmation_orders_and_completion_idempotency (test_market.MarketTests.test_both_confirmation_orders_and_completion_idempotency) ... ok
+test_cancel_before_accept_and_snapshot_history (test_market.MarketTests.test_cancel_before_accept_and_snapshot_history) ... ok
+test_cancellation_blocks_completion_and_resets_epoch (test_market.MarketTests.test_cancellation_blocks_completion_and_resets_epoch) ... ok
+test_confirmation_before_commit_fault_rolls_back_flags (test_market.MarketTests.test_confirmation_before_commit_fault_rolls_back_flags) ... ok
+test_cross_process_last_item_competition (test_market.MarketTests.test_cross_process_last_item_competition) ... ok
+test_disabled_participant_pending_cancel_is_closed_consistently (test_market.MarketTests.test_disabled_participant_pending_cancel_is_closed_consistently) ... ok
+test_duplicate_request_and_key_misuse (test_market.MarketTests.test_duplicate_request_and_key_misuse) ... ok
+test_failed_cli_account_switch_clears_old_identity (test_market.MarketTests.test_failed_cli_account_switch_clears_old_identity) ... ok
+test_half_open_stats_and_beijing_conversion (test_market.MarketTests.test_half_open_stats_and_beijing_conversion) ... ok
+test_moderation_and_completion_real_process_race (test_market.MarketTests.test_moderation_and_completion_real_process_race) ... ok
+test_moderation_before_and_after_completion (test_market.MarketTests.test_moderation_before_and_after_completion) ... ok
+test_money_boundaries_and_no_rounding (test_market.MarketTests.test_money_boundaries_and_no_rounding) ... ok
+test_price_change_invalidates_old_page (test_market.MarketTests.test_price_change_invalidates_old_page) ... ok
+test_private_records_and_ownership (test_market.MarketTests.test_private_records_and_ownership) ... ok
+test_queries_pagination_wildcards_and_categories (test_market.MarketTests.test_queries_pagination_wildcards_and_categories) ... ok
+test_registration_and_credentials (test_market.MarketTests.test_registration_and_credentials) ... ok
+test_reject_reservation_restores_publication (test_market.MarketTests.test_reject_reservation_restores_publication) ... ok
+test_restore_requires_unrestriction_and_reapproval (test_market.MarketTests.test_restore_requires_unrestriction_and_reapproval) ... ok
+test_review_rejection_and_resubmission (test_market.MarketTests.test_review_rejection_and_resubmission) ... ok
+test_ten_faults_each_creation_and_cancellation (test_market.MarketTests.test_ten_faults_each_creation_and_cancellation) ... ok
+test_withdraw_and_approve_cancellation (test_market.MarketTests.test_withdraw_and_approve_cancellation) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 30.538s
+
+OK
