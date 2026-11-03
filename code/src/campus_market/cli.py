@@ -13,11 +13,30 @@ from campus_market.models import MarketError
 from campus_market.queries import Market
 
 OPERATIONS = (
-    "create_product", "edit_product", "submit_product", "review_product", "take_down",
-    "restore_draft", "list_products", "get_product", "reserve", "seller_decision",
-    "cancel_pending", "request_cancellation", "decide_cancellation", "confirm",
-    "get_reservation", "list_reservations", "restrict", "unrestrict", "disable_user",
-    "close_disabled_trade", "seller_stats", "category_stats", "logs", "users",
+    "create_product",
+    "edit_product",
+    "submit_product",
+    "review_product",
+    "take_down",
+    "restore_draft",
+    "list_products",
+    "get_product",
+    "reserve",
+    "seller_decision",
+    "cancel_pending",
+    "request_cancellation",
+    "decide_cancellation",
+    "confirm",
+    "get_reservation",
+    "list_reservations",
+    "restrict",
+    "unrestrict",
+    "disable_user",
+    "close_disabled_trade",
+    "seller_stats",
+    "category_stats",
+    "logs",
+    "users",
 )
 
 HELP = """登录后使用：操作名 {JSON参数}，ID和版本从上一条结果复制。
@@ -74,6 +93,10 @@ class Shell:
                 raise MarketError("INVALID_INPUT", "请提供一个账号名称", 422)
             password = getpass("密码（10至200字符，不回显）: ")
             if command == "login":
+                # A failed account switch must not leave the previous identity active.
+                if self.token:
+                    self.market.logout(self.token)
+                self.token = ""
                 self.token = self.market.login(args[0], password)
                 output(asdict(self.market.me(self.token)))
             elif command == "register":

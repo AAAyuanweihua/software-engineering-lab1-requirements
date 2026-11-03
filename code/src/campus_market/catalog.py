@@ -3,7 +3,7 @@
 from pathlib import PurePath
 
 from campus_market.core import Core
-from campus_market.models import now, new_id, price_cents, required
+from campus_market.models import new_id, now, price_cents, required
 
 
 class Catalog(Core):
@@ -45,9 +45,13 @@ class Catalog(Core):
         }
         image = fields["image_ref"]
         self.require(
-            PurePath(image).name == image and "/" not in image and "\\" not in image
+            PurePath(image).name == image
+            and "/" not in image
+            and "\\" not in image
             and PurePath(image).suffix.lower() in (".png", ".jpg", ".jpeg", ".webp"),
-            "INVALID_IMAGE", "仅保存图片文件名引用，不接受路径；支持PNG/JPG/WEBP", 422,
+            "INVALID_IMAGE",
+            "仅保存图片文件名引用，不接受路径；支持PNG/JPG/WEBP",
+            422,
         )
 
         def operation(connection, actor):
@@ -57,14 +61,23 @@ class Catalog(Core):
                 product = self.owned(connection, actor, product_id)
                 self.require(
                     product["status"] in ("DRAFT", "PUBLISHED") and not product["restricted"],
-                    "STATE_CONFLICT", "当前状态不能修改，请先处理预约或恢复草稿",
+                    "STATE_CONFLICT",
+                    "当前状态不能修改，请先处理预约或恢复草稿",
                 )
                 state = "REVIEWING" if product["status"] == "PUBLISHED" else "DRAFT"
                 connection.execute(
                     "UPDATE products SET title=?,category=?,description=?,image_ref=?,"
                     "price_cents=?,status=?,version=version+1,updated_at=? WHERE id=?",
-                    (fields["title"], category, fields["description"], image,
-                     fields["price_cents"], state, stamp, product_id),
+                    (
+                        fields["title"],
+                        category,
+                        fields["description"],
+                        image,
+                        fields["price_cents"],
+                        state,
+                        stamp,
+                        product_id,
+                    ),
                 )
                 result_id = product_id
             else:
@@ -72,20 +85,38 @@ class Catalog(Core):
                 connection.execute(
                     "INSERT INTO products(id,seller_id,title,category,description,image_ref,"
                     "price_cents,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?,'DRAFT',?,?)",
-                    (result_id, actor.id, fields["title"], category, fields["description"],
-                     image, fields["price_cents"], stamp, stamp),
+                    (
+                        result_id,
+                        actor.id,
+                        fields["title"],
+                        category,
+                        fields["description"],
+                        image,
+                        fields["price_cents"],
+                        stamp,
+                        stamp,
+                    ),
                 )
             return self.product(connection, result_id)
 
-        return self.write(token, "EDIT_PRODUCT" if product_id else "CREATE_PRODUCT",
-                          product_id or "", fields, operation)
+        return self.write(
+            token,
+            "EDIT_PRODUCT" if product_id else "CREATE_PRODUCT",
+            product_id or "",
+            fields,
+            operation,
+        )
 
     def submit_product(self, token, product_id):
         """Only unrestricted drafts enter the moderation queue."""
+
         def operation(connection, actor):
             product = self.owned(connection, actor, product_id)
-            self.require(product["status"] == "DRAFT" and not product["restricted"],
-                         "STATE_CONFLICT", "仅未受限制的草稿可提交")
+            self.require(
+                product["status"] == "DRAFT" and not product["restricted"],
+                "STATE_CONFLICT",
+                "仅未受限制的草稿可提交",
+            )
             self.set_product_state(connection, product_id, "REVIEWING")
             return self.product(connection, product_id)
 
@@ -99,23 +130,35 @@ class Catalog(Core):
         def operation(connection, actor):
             product = self.product(connection, product_id)
             self.require(product["version"] == version, "STALE_VERSION", "审核版本已变化")
-            self.require(product["status"] == "REVIEWING" and not product["restricted"],
-                         "STATE_CONFLICT", "仅审核当前未受限制的待审核商品")
+            self.require(
+                product["status"] == "REVIEWING" and not product["restricted"],
+                "STATE_CONFLICT",
+                "仅审核当前未受限制的待审核商品",
+            )
             state = "PUBLISHED" if approve else "DRAFT"
             self.set_product_state(connection, product_id, state)
             if approve:
-                connection.execute("UPDATE products SET published_at=? WHERE id=?",
-                                   (now(), product_id))
-            connection.execute("INSERT INTO reviews VALUES (?,?,?,?,?,?,?)",
-                               (new_id(), product_id, actor.id, version, state, reason, now()))
+                connection.execute(
+                    "UPDATE products SET published_at=? WHERE id=?", (now(), product_id)
+                )
+            connection.execute(
+                "INSERT INTO reviews VALUES (?,?,?,?,?,?,?)",
+                (new_id(), product_id, actor.id, version, state, reason, now()),
+            )
             return self.product(connection, product_id)
 
-        return self.write(token, "REVIEW", product_id,
-                          {"version": version, "approve": approve, "reason": reason},
-                          operation, admin=True)
+        return self.write(
+            token,
+            "REVIEW",
+            product_id,
+            {"version": version, "approve": approve, "reason": reason},
+            operation,
+            admin=True,
+        )
 
     def take_down(self, token, product_id):
         """Sellers cannot use ordinary takedown to bypass an active transaction."""
+
         def operation(connection, actor):
             product = self.owned(connection, actor, product_id)
             self.require(product["status"] == "PUBLISHED", "STATE_CONFLICT", "仅已发布可下架")
@@ -126,10 +169,14 @@ class Catalog(Core):
 
     def restore_draft(self, token, product_id):
         """Restoration never publishes directly and never revives completed items."""
+
         def operation(connection, actor):
             product = self.owned(connection, actor, product_id)
-            self.require(product["status"] == "OFFLINE" and not product["restricted"],
-                         "STATE_CONFLICT", "须为已下架且已解除违规限制的商品")
+            self.require(
+                product["status"] == "OFFLINE" and not product["restricted"],
+                "STATE_CONFLICT",
+                "须为已下架且已解除违规限制的商品",
+            )
             self.set_product_state(connection, product_id, "DRAFT")
             return self.product(connection, product_id)
 

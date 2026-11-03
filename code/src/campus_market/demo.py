@@ -21,7 +21,9 @@ def demonstrate(path):
         accounts[name] = market.login(account, password)
     admin, seller, buyer = (accounts[name] for name in ("admin", "seller", "buyer"))
     events = []
-    draft = market.create_product(seller, "线性代数教材", "教材", "35.00", "九成新，无缺页", "book.jpg")
+    draft = market.create_product(
+        seller, "线性代数教材", "教材", "35.00", "九成新，无缺页", "book.jpg"
+    )
     events.append({"step": "draft", "status": draft["status"]})
     submitted = market.submit_product(seller, draft["id"])
     published = market.review_product(admin, draft["id"], submitted["version"], True)
@@ -29,14 +31,21 @@ def demonstrate(path):
     key = new_id()
     reservation = market.reserve(buyer, draft["id"], published["version"], key)
     assert market.reserve(buyer, draft["id"], published["version"], key) == reservation
-    events.append({"step": "reserve_retry", "same_result": True, "price_cents": reservation["price_cents"]})
+    events.append(
+        {"step": "reserve_retry", "same_result": True, "price_cents": reservation["price_cents"]}
+    )
     accepted = market.seller_decision(seller, reservation["id"], True, new_id())
     first = market.confirm(buyer, reservation["id"], accepted["epoch"], new_id())
     events.append({"step": "one_party", "status": first["status"]})
     cancellation = market.request_cancellation(buyer, reservation["id"], "暂时无法交付", new_id())
     reset = market.decide_cancellation(seller, cancellation["id"], "REJECTED", new_id())
-    events.append({"step": "cancel_rejected", "epoch": reset["epoch"],
-                   "flags": [reset["buyer_confirmed"], reset["seller_confirmed"]]})
+    events.append(
+        {
+            "step": "cancel_rejected",
+            "epoch": reset["epoch"],
+            "flags": [reset["buyer_confirmed"], reset["seller_confirmed"]],
+        }
+    )
     try:
         market.confirm(buyer, reservation["id"], first["epoch"], new_id())
     except MarketError as exc:
@@ -45,12 +54,23 @@ def demonstrate(path):
     completion_key = new_id()
     completed = market.confirm(seller, reservation["id"], reset["epoch"], completion_key)
     retry = market.confirm(seller, reservation["id"], reset["epoch"], completion_key)
-    events.append({"step": "completed", "status": completed["status"],
-                   "stable_time": completed["completed_at"] == retry["completed_at"]})
+    events.append(
+        {
+            "step": "completed",
+            "status": completed["status"],
+            "stable_time": completed["completed_at"] == retry["completed_at"],
+        }
+    )
     restricted = market.restrict(admin, draft["id"], "演示完成后追加违规标记")
-    events.append({"step": "post_completion_moderation",
-                   "status": restricted["product"]["status"],
-                   "restricted": restricted["product"]["restricted"]})
-    events.append({"step": "seller_stats", **market.seller_stats(seller, "2020-01-01", "2100-01-01")})
+    events.append(
+        {
+            "step": "post_completion_moderation",
+            "status": restricted["product"]["status"],
+            "restricted": restricted["product"]["restricted"],
+        }
+    )
+    events.append(
+        {"step": "seller_stats", **market.seller_stats(seller, "2020-01-01", "2100-01-01")}
+    )
     events.append({"step": "audit_count", "count": len(market.logs(admin))})
     return events

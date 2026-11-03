@@ -24,8 +24,16 @@ class Market(Trade):
     """Public facade for presentation and tests, with fresh authorization per read."""
 
     def list_products(
-        self, token="", scope="public", keyword="", category="", minimum=None,
-        maximum=None, status=None, order="newest", page=1,
+        self,
+        token="",
+        scope="public",
+        keyword="",
+        category="",
+        minimum=None,
+        maximum=None,
+        status=None,
+        order="newest",
+        page=1,
     ):
         """Combine conditions, apply visibility first, and return deterministic pages of 20."""
         self.require(isinstance(page, int) and page >= 1, "INVALID_PAGE", "页码须为正整数", 422)
@@ -45,7 +53,9 @@ class Market(Trade):
                 conditions.append("p.seller_id=?")
                 args.append(actor.id)
             elif scope == "admin":
-                self.require(actor is not None and actor.admin, "FORBIDDEN", "仅管理员可查全部", 403)
+                self.require(
+                    actor is not None and actor.admin, "FORBIDDEN", "仅管理员可查全部", 403
+                )
             else:
                 raise MarketError("INVALID_SCOPE", "查询范围无效", 422)
             if status:
@@ -71,7 +81,12 @@ class Market(Trade):
                 "SELECT p.*" + base + " ORDER BY " + sorts[order] + " LIMIT 20 OFFSET ?",
                 [*args, (page - 1) * 20],
             ).fetchall()
-            return {"items": [dict(row) for row in rows], "total": total, "page": page, "page_size": 20}
+            return {
+                "items": [dict(row) for row in rows],
+                "total": total,
+                "page": page,
+                "page_size": 20,
+            }
 
     def get_product(self, product_id, token=""):
         """Do not leak another seller's non-public draft by direct identifier."""
@@ -79,7 +94,9 @@ class Market(Trade):
             product = self.product(connection, product_id)
             actor = self.identity(connection, token) if token else None
             public = product["status"] == "PUBLISHED" and not product["restricted"]
-            seller = self.one(connection, "SELECT enabled FROM users WHERE id=?", (product["seller_id"],))
+            seller = self.one(
+                connection, "SELECT enabled FROM users WHERE id=?", (product["seller_id"],)
+            )
             public = public and seller["enabled"]
             own = actor and (actor.id == product["seller_id"] or actor.admin)
             self.require(bool(public or own), "NOT_FOUND", "商品不存在或不可访问", 404)
@@ -90,12 +107,19 @@ class Market(Trade):
         with closing(self.database.connect()) as connection:
             actor = self.identity(connection, token)
             reservation = self.reservation(connection, reservation_id)
-            self.require(actor.admin or actor.id in (reservation["buyer_id"], reservation["seller_id"]),
-                         "FORBIDDEN", "无权查看他人私人预约", 403)
-            reservation["cancellations"] = [dict(row) for row in connection.execute(
-                "SELECT * FROM cancellations WHERE reservation_id=? ORDER BY created_at,id",
-                (reservation_id,),
-            )]
+            self.require(
+                actor.admin or actor.id in (reservation["buyer_id"], reservation["seller_id"]),
+                "FORBIDDEN",
+                "无权查看他人私人预约",
+                403,
+            )
+            reservation["cancellations"] = [
+                dict(row)
+                for row in connection.execute(
+                    "SELECT * FROM cancellations WHERE reservation_id=? ORDER BY created_at,id",
+                    (reservation_id,),
+                )
+            ]
             return reservation
 
     def list_reservations(self, token):
@@ -105,7 +129,8 @@ class Market(Trade):
             rows = connection.execute(
                 "SELECT r.*,p.title,p.seller_id FROM reservations r "
                 "JOIN products p ON p.id=r.product_id WHERE r.buyer_id=? OR p.seller_id=? "
-                "ORDER BY r.created_at DESC,r.id", (actor.id, actor.id),
+                "ORDER BY r.created_at DESC,r.id",
+                (actor.id, actor.id),
             )
             return [dict(row) for row in rows]
 
@@ -119,7 +144,8 @@ class Market(Trade):
                 "SELECT count(*) AS completed_count,coalesce(sum(r.price_cents),0) AS total_cents "
                 "FROM reservations r JOIN products p ON p.id=r.product_id "
                 "WHERE p.seller_id=? AND r.status='COMPLETED' AND r.completed_at>=? "
-                "AND r.completed_at<?", (actor.id, start_utc, end_utc),
+                "AND r.completed_at<?",
+                (actor.id, start_utc, end_utc),
             ).fetchone()
             return {**dict(row), "start_utc": start_utc, "end_utc_exclusive": end_utc}
 
@@ -133,7 +159,8 @@ class Market(Trade):
             rows = connection.execute(
                 "SELECT category,count(*) AS count FROM products "
                 + ("WHERE status=? " if status else "")
-                + "GROUP BY category ORDER BY category", (status,) if status else (),
+                + "GROUP BY category ORDER BY category",
+                (status,) if status else (),
             )
             return [dict(row) for row in rows]
 
@@ -154,15 +181,22 @@ class Market(Trade):
             actor = self.identity(connection, token)
             self.require(actor.admin, "FORBIDDEN", "仅管理员可查操作日志", 403)
             where = " WHERE " + " AND ".join(conditions) if conditions else ""
-            return [dict(row) for row in connection.execute(
-                "SELECT * FROM audit_logs" + where + " ORDER BY created_at,id", args,
-            )]
+            return [
+                dict(row)
+                for row in connection.execute(
+                    "SELECT * FROM audit_logs" + where + " ORDER BY created_at,id",
+                    args,
+                )
+            ]
 
     def users(self, token):
         """Management listing excludes password hashes and session credentials."""
         with closing(self.database.connect()) as connection:
             actor = self.identity(connection, token)
             self.require(actor.admin, "FORBIDDEN", "仅管理员可查用户列表", 403)
-            return [dict(row) for row in connection.execute(
-                "SELECT id,account,enabled,admin FROM users ORDER BY account"
-            )]
+            return [
+                dict(row)
+                for row in connection.execute(
+                    "SELECT id,account,enabled,admin FROM users ORDER BY account"
+                )
+            ]

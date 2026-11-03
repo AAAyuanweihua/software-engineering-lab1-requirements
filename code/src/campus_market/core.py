@@ -56,8 +56,15 @@ class Core:
         """Append sanitized state information; callers never pass credentials."""
         connection.execute(
             "INSERT INTO audit_logs VALUES (?,?,?,?,?,?,?)",
-            (new_id(), actor_id, action, object_id, outcome,
-             json.dumps(detail, ensure_ascii=False, sort_keys=True), now()),
+            (
+                new_id(),
+                actor_id,
+                action,
+                object_id,
+                outcome,
+                json.dumps(detail, ensure_ascii=False, sort_keys=True),
+                now(),
+            ),
         )
 
     def failure(self, actor_id: str | None, action: str, object_id: str, code: str) -> None:
@@ -68,8 +75,14 @@ class Core:
             connection.commit()
 
     def write(
-        self, token: str, action: str, object_id: str, payload: dict,
-        operation: Operation, key: str | None = None, admin: bool = False,
+        self,
+        token: str,
+        action: str,
+        object_id: str,
+        payload: dict,
+        operation: Operation,
+        key: str | None = None,
+        admin: bool = False,
     ) -> dict:
         """Serialize business writes; receipts and successful audits commit atomically."""
         actor_id = None
@@ -91,7 +104,8 @@ class Core:
                         ).fetchone()
                         if previous:
                             self.require(
-                                previous["payload_hash"] == signature, "KEY_CONFLICT",
+                                previous["payload_hash"] == signature,
+                                "KEY_CONFLICT",
                                 "同一请求键不能用于不同参数",
                             )
                             connection.commit()
@@ -125,14 +139,18 @@ class Core:
             try:
                 connection.execute("BEGIN IMMEDIATE")
                 if bootstrap:
-                    count = connection.execute("SELECT count(*) FROM users WHERE admin=1").fetchone()[0]
+                    count = connection.execute(
+                        "SELECT count(*) FROM users WHERE admin=1"
+                    ).fetchone()[0]
                     self.require(count == 0, "ADMIN_EXISTS", "首个管理员已经初始化")
                 user_id = new_id()
                 connection.execute(
                     "INSERT INTO users(id,account,password_hash,admin) VALUES (?,?,?,?)",
                     (user_id, account, encoded, int(bootstrap)),
                 )
-                self.audit(connection, user_id, "REGISTER", user_id, "SUCCESS", {"admin": bootstrap})
+                self.audit(
+                    connection, user_id, "REGISTER", user_id, "SUCCESS", {"admin": bootstrap}
+                )
                 connection.commit()
                 return user_id
             except sqlite3.IntegrityError as exc:
