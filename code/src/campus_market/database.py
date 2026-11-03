@@ -1,6 +1,7 @@
 """SQLite schema and connection factory, with constraints as a concurrency backstop."""
 
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 SCHEMA = """
@@ -43,7 +44,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS one_active_reservation
 CREATE TABLE IF NOT EXISTS cancellations (
  id TEXT PRIMARY KEY, reservation_id TEXT NOT NULL REFERENCES reservations(id),
  reason TEXT NOT NULL,
- status TEXT NOT NULL CHECK(status IN ('PENDING','APPROVED','REJECTED','WITHDRAWN')),
+ status TEXT NOT NULL CHECK(status IN ('PENDING','APPROVED','REJECTED','WITHDRAWN','CLOSED')),
  created_at TEXT NOT NULL, decided_at TEXT
 );
 CREATE UNIQUE INDEX IF NOT EXISTS one_pending_cancellation
@@ -79,7 +80,7 @@ class Database:
     def __init__(self, path: str | Path):
         self.path = Path(path).resolve()
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.connect() as connection:
+        with closing(self.connect()) as connection:
             connection.execute("PRAGMA journal_mode=WAL")
             connection.executescript(SCHEMA)
             connection.executemany(
