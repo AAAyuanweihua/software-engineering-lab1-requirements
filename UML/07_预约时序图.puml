@@ -1,0 +1,46 @@
+@startuml
+title 预约时序图（交互性 / 时序图）
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam ArrowColor #396774
+skinparam classBackgroundColor #F0F7F5
+skinparam componentBackgroundColor #F0F7F5
+skinparam stateBackgroundColor #F0F7F5
+skinparam roundcorner 8
+hide empty members
+actor 买家 as Buyer
+boundary 商品详情页 as UI
+control ReservationService as S
+database PostgreSQL as DB
+control AuditService as A
+Buyer -> UI : 点击预约
+UI -> S : reserve(productId, seenVersion, requestKey)
+S -> S : 身份、停用状态、资源权限校验
+S -> DB : BEGIN；锁定商品行 FOR UPDATE
+S -> DB : 查询(actorId, requestKey)回执
+alt 回执已存在且请求摘要相同
+ DB --> S : 原处理结果
+ S -> DB : COMMIT
+ S --> UI : 返回原结果（不再建预约）
+else 新请求
+ S -> DB : 核对版本、已发布、非本人、无限制
+ alt 版本/状态不符
+  S -> DB : ROLLBACK
+  S -> A : 独立记录失败原因
+  S --> UI : 409 提示刷新，不创建预约
+ else 可预约
+  S -> DB : INSERT预约（价格快照）
+  S -> DB : 更新商品为已预约、保存回执与成功日志
+  note over S,DB
+   部分唯一索引阻止同商品多条有效预约
+   中间异常全部回滚；回执与业务结果同事务
+  end note
+  S -> DB : COMMIT
+  S --> UI : 201 返回预约及当前状态
+ end
+end
+UI --> Buyer : 成功页或明确异常下一步
+
+@enduml

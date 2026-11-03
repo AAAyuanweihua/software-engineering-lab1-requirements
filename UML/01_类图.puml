@@ -1,0 +1,87 @@
+@startuml
+title 类图（结构性 / 类图）
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam ArrowColor #396774
+skinparam classBackgroundColor #F0F7F5
+skinparam componentBackgroundColor #F0F7F5
+skinparam stateBackgroundColor #F0F7F5
+skinparam roundcorner 8
+hide empty members
+class User {
+ +id: UUID
+ +account: String {unique}
+ -passwordHash: String
+ +enabled: Boolean
+ +admin: Boolean
+}
+class Product {
+ +id: UUID
+ +title: String
+ +price: Decimal(7,2)
+ +status: ProductStatus
+ +version: Long
+ +restricted: Boolean
+ +publishedAt: Instant
+ +changeDetails()
+}
+class Category {
+ +id: UUID
+}
+class Reservation {
+ +id: UUID
+ +status: ReservationStatus
+ +priceSnapshot: Decimal(7,2)
+ +buyerConfirmed: Boolean
+ +sellerConfirmed: Boolean
+ +confirmationEpoch: Long
+ +completedAt: Instant?
+ +confirmDelivery(actor, epoch)
+}
+class Cancellation {
+ +id: UUID
+ +status: Pending/Approved/Rejected/Withdrawn
+ +reason: String
+ +decide()
+}
+class ReviewRecord {
+ +decision: String
+ +reason: String
+ +productVersion: Long
+}
+class AuditLog {
+ +actorId: UUID
+ +action: String
+ +beforeAfter: JSON
+ +outcome: String
+ +occurredAt: Instant
+}
+class RequestReceipt {
+ +actorId: UUID
+ +requestKey: UUID
+ +payloadHash: String
+ +result: JSON
+}
+User "1" -- "0..*" Product : 卖家
+User "1" -- "0..*" Reservation : 买家
+Product "1" -- "0..*" Reservation : 历史预约
+Category "1" -- "0..*" Product
+Reservation "1" *-- "0..*" Cancellation
+Product "1" -- "0..*" ReviewRecord
+User "1" -- "0..*" ReviewRecord : 审核者
+User "1" -- "0..*" AuditLog : 操作者
+User "1" -- "0..*" RequestReceipt
+note bottom of Reservation
+有效状态：PENDING、CONFIRMED、CANCEL_PENDING
+每商品最多一条有效预约（数据库部分唯一索引）
+取消拒绝/撤回：清空双方标记并递增confirmationEpoch
+防止旧确认请求在标记重置后再次生效
+end note
+note bottom of Product
+0 < price <= 99999.99，最多两位小数
+同一User可同时买卖；不拆成互斥子类
+end note
+
+@enduml

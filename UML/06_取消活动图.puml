@@ -1,0 +1,45 @@
+@startuml
+title 取消活动图（行为性 / 活动图）
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam ArrowColor #396774
+skinparam classBackgroundColor #F0F7F5
+skinparam componentBackgroundColor #F0F7F5
+skinparam stateBackgroundColor #F0F7F5
+skinparam roundcorner 8
+hide empty members
+start
+:鉴权、核对本人预约;
+:开启事务，按商品->预约顺序加锁;
+if (仍待卖家处理?) then (是)
+ :关闭预约，商品恢复发布;
+else (否)
+ if (已确认且未完成?) then (是)
+  :保存取消申请；预约置CANCEL_PENDING;
+  :提交并记录成功审计;
+  :等待卖家处理或买家撤回;
+  :再次鉴权、加锁并核对申请仍待处理;
+  if (卖家同意?) then (是)
+   :关闭预约，释放商品占用;
+  else (拒绝或买家撤回)
+   :恢复CONFIRMED；清空双方标记;
+   :confirmationEpoch递增;
+  endif
+ else (非法状态)
+  :回滚，不修改数据；返回状态冲突;
+  :另记失败日志;
+  stop
+ endif
+endif
+:原子保存商品、预约、申请与成功日志;
+:提交事务；返回当前结果;
+note right
+待处理取消期间不允许完成
+任一步数据库异常：整体回滚后记录失败
+重复请求根据requestKey返回已保存结果
+end note
+stop
+
+@enduml

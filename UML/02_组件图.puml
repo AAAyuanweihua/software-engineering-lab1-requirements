@@ -1,0 +1,53 @@
+@startuml
+title 组件图（结构性 / 组件图）
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam ArrowColor #396774
+skinparam classBackgroundColor #F0F7F5
+skinparam componentBackgroundColor #F0F7F5
+skinparam stateBackgroundColor #F0F7F5
+skinparam roundcorner 8
+hide empty members
+top to bottom direction
+package "浏览器表示层" {
+ [买卖用户界面] as UserUI
+ [独立管理员界面] as AdminUI
+}
+package "分层单体：同一部署单元" {
+ [REST Controllers] as API
+ [身份与资源授权] as Auth
+ [商品与查询模块] as Catalog
+ [交易应用服务\n预约/取消/双方确认] as Trade
+ [审核与治理模块] as Gov
+ [统计查询模块] as Stats
+ [审计模块] as Audit
+ [Repository + UnitOfWork] as Repo
+}
+database "PostgreSQL" as DB
+folder "受控图片存储" as Images
+UserUI --> API : HTTPS/JSON
+AdminUI --> API : HTTPS/JSON
+API --> Auth : 每请求校验
+API --> Catalog
+API --> Trade
+API --> Gov
+API --> Stats
+Gov --> Trade : 同事务关闭未完成交易
+Catalog --> Repo
+Trade --> Repo
+Gov --> Repo
+Stats --> Repo : 只读聚合
+Catalog --> Images
+Trade --> Audit : 成功审计同事务
+Gov --> Audit
+Audit --> Repo
+Repo --> DB : 参数化SQL/本地事务
+note bottom of Repo
+统一锁顺序：商品 -> 预约 -> 取消申请
+同一事务更新商品、预约、回执与成功审计
+失败回滚后另记失败审计，不能假装成功
+end note
+
+@enduml

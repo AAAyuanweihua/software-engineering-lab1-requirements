@@ -1,0 +1,50 @@
+@startuml
+title 商品状态图（行为性 / 状态图）
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam ArrowColor #396774
+skinparam classBackgroundColor #F0F7F5
+skinparam componentBackgroundColor #F0F7F5
+skinparam stateBackgroundColor #F0F7F5
+skinparam roundcorner 8
+hide empty members
+state "草稿" as Draft
+state "待审核" as Reviewing
+state "已发布" as Published
+state "已预约" as Reserved
+state "已确认" as Confirmed
+state "已完成" as Completed
+state "已下架" as Offline
+[*] --> Draft
+Draft --> Reviewing : 提交有效信息
+Reviewing --> Draft : 驳回并附原因
+Reviewing --> Published : 审核通过
+Published --> Reviewing : 修改并重审 / version更新
+Published --> Reserved : 当前版本预约成功
+Reserved --> Published : 买家取消 / 卖家拒绝
+Reserved --> Confirmed : 卖家接受
+Confirmed --> Confirmed : 单方交付确认
+Confirmed --> Confirmed : 申请取消 / 暂停完成
+Confirmed --> Confirmed : 拒绝或撤回取消\n清空标记、epoch递增
+Confirmed --> Published : 卖家同意取消
+Confirmed --> Completed : 双方确认且无待处理取消
+Published --> Offline : 主动下架或违规
+Reserved --> Offline : 违规 / 关闭预约
+Confirmed --> Offline : 违规 / 关闭预约
+Reviewing --> Offline : 违规处置
+Draft --> Offline : 违规处置
+Offline --> Draft : 主动恢复或违规解限后重提
+Completed --> Completed : 违规只加限制 / 不改完成事实
+note bottom of Completed
+禁止再预约、回草稿、普通撤销、管理员代确认
+违规与完成竞争：以先成功生效的事务为准
+end note
+note left of Confirmed
+取消待处理是预约子状态，不新增商品主状态
+停用账号在途由管理员有因关闭
+不受违规限制的商品才允许恢复发布
+end note
+
+@enduml

@@ -1,0 +1,50 @@
+@startuml
+title 用例图（行为性 / 用例图）
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam ArrowColor #396774
+skinparam classBackgroundColor #F0F7F5
+skinparam componentBackgroundColor #F0F7F5
+skinparam stateBackgroundColor #F0F7F5
+skinparam roundcorner 8
+hide empty members
+left to right direction
+actor "普通用户" as User
+actor "买家（业务角色）" as Buyer
+actor "卖家（业务角色）" as Seller
+actor "管理员" as Admin
+User <|-- Buyer
+User <|-- Seller
+rectangle "校园二手交易系统" {
+ usecase "注册 / 登录" as Login
+ usecase "多条件查询 / 分页" as Search
+ usecase "预约 / 确认前取消" as Book
+ usecase "确认后申请 / 撤回取消" as Cancel
+ usecase "分别确认线下交付" as Finish
+ usecase "草稿 / 提交审核 / 修改 / 下架" as Edit
+ usecase "接受 / 拒绝预约\n处理取消申请" as Handle
+ usecase "本人已完成交易统计" as OwnStats
+ usecase "审核 / 违规 / 解除限制" as Review
+ usecase "账号停用 / 在途关闭" as Disable
+ usecase "分类统计 / 日志查询" as Manage
+}
+User --> Login
+User --> Search
+Buyer --> Book
+Buyer --> Cancel
+Buyer --> Finish
+Seller --> Finish
+Seller --> Edit
+Seller --> Handle
+Seller --> OwnStats
+Admin --> Review
+Admin --> Disable
+Admin --> Manage
+note bottom of User
+买卖是同一普通账号在不同业务中的角色
+管理员注册仅经初始化或受控邀请
+end note
+
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+title 部署图（结构性 / 部署图）
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam backgroundColor #FFFFFF
+skinparam ArrowColor #396774
+skinparam classBackgroundColor #F0F7F5
+skinparam componentBackgroundColor #F0F7F5
+skinparam stateBackgroundColor #F0F7F5
+skinparam roundcorner 8
+hide empty members
+node "用户设备" {
+ artifact "浏览器\n买卖界面 / 管理界面" as Browser
+}
+node "应用主机（课程原型）" {
+ node "反向代理 / TLS" as Proxy
+ artifact "模块化单体应用" as App
+ folder "图片文件（随机文件名、限制类型）" as Files
+}
+node "数据主机（可与应用同机）" {
+ database "PostgreSQL\n事务、约束、索引" as DB
+ folder "备份 / 恢复资料" as Backup
+}
+Browser --> Proxy : HTTPS
+Proxy --> App : 内部HTTP
+App --> DB : 私有数据库连接
+App --> Files : 校验后读写
+DB --> Backup : 定期备份（设计方案）
+note bottom of App
+应用负责鉴权；前端隐藏按钮不是安全边界
+原型不接真实支付、物流或消息服务
+end note
+
+@enduml
