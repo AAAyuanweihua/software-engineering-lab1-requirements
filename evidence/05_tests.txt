@@ -30,6 +30,7 @@ test_r02_shell_continues_after_bad_json_type_and_logs_out (test_review_regressio
 test_r03_lock_released_during_audit_persists_failure (test_review_regressions.ReviewRegressions.test_r03_lock_released_during_audit_persists_failure) ... ok
 test_r03_persistent_lock_returns_business_error_and_truthful_audit_status (test_review_regressions.ReviewRegressions.test_r03_persistent_lock_returns_business_error_and_truthful_audit_status) ... ok
 test_r04_market_sqlite_and_runtime_faults_have_rollback_and_safe_audit (test_review_regressions.ReviewRegressions.test_r04_market_sqlite_and_runtime_faults_have_rollback_and_safe_audit) ... ok
+test_r05_equal_price_order_is_stable_but_separate_pages_use_new_snapshots (test_review_regressions.ReviewRegressions.test_r05_equal_price_order_is_stable_but_separate_pages_use_new_snapshots) ... ok
 test_r05_publication_between_count_and_rows_keeps_one_response_snapshot (test_review_regressions.ReviewRegressions.test_r05_publication_between_count_and_rows_keeps_one_response_snapshot) ... ok
 test_r05_takedown_between_count_and_rows_keeps_one_response_snapshot (test_review_regressions.ReviewRegressions.test_r05_takedown_between_count_and_rows_keeps_one_response_snapshot) ... ok
 test_r06_admin_disabled_close_preserves_aggregate_transition_audit (test_review_regressions.ReviewRegressions.test_r06_admin_disabled_close_preserves_aggregate_transition_audit) ... ok
@@ -39,6 +40,6 @@ test_r07_all_required_receipt_operations_reject_invalid_keys_before_write (test_
 test_r07_valid_receipt_replay_and_cross_action_collision (test_review_regressions.ReviewRegressions.test_r07_valid_receipt_replay_and_cross_action_collision) ... ok
 
 ----------------------------------------------------------------------
-Ran 38 tests in 51.615s
+Ran 39 tests in 69.440s
 
 OK

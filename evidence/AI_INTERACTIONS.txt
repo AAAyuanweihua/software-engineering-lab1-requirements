@@ -71,3 +71,5 @@ Added 16 review regression tests without inheriting and re-running the original
 22 tests twice. Rebuilt version 0.1.1 to distinguish the corrected wheel.
 The supplied review is evidence, not proof that all future changes were personally
 reviewed. No experiment report prose is generated; this is a technical change log.
+
+Additional R05 verification: added deterministic equal-price id ordering and explicit cross-request pagination-change semantics. The final complete suite has 22 original plus 17 regression tests, 39 total, followed by a fresh 0.1.1 wheel build/install/demo.

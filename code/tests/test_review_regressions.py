@@ -273,6 +273,20 @@ class ReviewRegressions(unittest.TestCase):
         self.assertEqual((result["total"], result["items"]), (0, []))
         self.assertEqual(self.market.list_products()["total"], 1)
 
+    def test_r05_equal_price_order_is_stable_but_separate_pages_use_new_snapshots(self):
+        products = [self.product(price="35.00") for _ in range(21)]
+        ordered_ids = sorted(product["id"] for product in products)
+        first = self.market.list_products(order="price_asc")
+        second = self.market.list_products(order="price_asc", page=2)
+        self.assertEqual([row["id"] for row in first["items"]], ordered_ids[:20])
+        self.assertEqual([row["id"] for row in second["items"]], ordered_ids[20:])
+        self.market.take_down(self.seller, ordered_ids[0])
+        # Each response is coherent; separate calls deliberately do not share a snapshot.
+        updated_second = self.market.list_products(order="price_asc", page=2)
+        updated_first = self.market.list_products(order="price_asc")
+        self.assertEqual((updated_second["total"], updated_second["items"]), (20, []))
+        self.assertEqual([row["id"] for row in updated_first["items"]], ordered_ids[1:])
+
     def test_r06_restrict_includes_closed_reservation_and_cancellation(self):
         reservation = self.accepted()
         self.market.confirm(self.buyer, reservation["id"], 1, new_id())

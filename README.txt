@@ -23,3 +23,5 @@ evidence/source_metrics.json为准，不包含测试、构建工具、UML或GUI�
  evidence/review-2026-11-03；修复后的针对性测试在
  code/tests/test_review_regressions.py。旧版lab3-verified标签不移动；
  新版将使用独立的lab3-v0.1.1标签。本人对修复后代码的验收仍需实际进行。
+
+最终补充回归：lab3-v0.1.1-r1，原22项加17项审查回归共39项通过；旧标签不移动。

@@ -5,6 +5,6 @@ Processing .\.
 Building wheels for collected packages: campus-market-lab3
   Building wheel for campus-market-lab3 (pyproject.toml): started
   Building wheel for campus-market-lab3 (pyproject.toml): finished with status 'done'
-  Created wheel for campus-market-lab3: filename=campus_market_lab3-0.1.1-py3-none-any.whl size=25653 sha256=f0749a31d6edb4d0aa19afa1fcdf0de94bd5db3b9db5475663939eb485d8c61d
-  Stored in directory: D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\903f46057f48426aa3ee2c1ae2708b72\pip-ephem-wheel-cache-otokuqi9\wheels\7c\30\28\4f926aa592c631aa538837b99f59d409bcb4491026d85a1d22
+  Created wheel for campus-market-lab3: filename=campus_market_lab3-0.1.1-py3-none-any.whl size=25653 sha256=3ae20af49499ba5cbcc9cf15a505349d6379503aee769a6c1157b2c585065bbe
+  Stored in directory: D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\5e6fd39b378647c384649c3a14434ae6\pip-ephem-wheel-cache-8mxfv31s\wheels\7c\30\28\4f926aa592c631aa538837b99f59d409bcb4491026d85a1d22
 Successfully built campus-market-lab3

@@ -2,8 +2,8 @@
   "baseline_commit": "083f3b77a41221f345c56de8e60fa2f8a33f7ded",
   "version": "0.1.1",
   "original_tests": 22,
-  "new_regression_tests": 16,
-  "total_tests": 38,
+  "new_regression_tests": 17,
+  "total_tests": 39,
   "findings": [
     {
       "finding": "R01",
@@ -47,7 +47,8 @@
       "current": "regression passed",
       "tests": [
         "test_r05_takedown_between_count_and_rows_keeps_one_response_snapshot",
-        "test_r05_publication_between_count_and_rows_keeps_one_response_snapshot"
+        "test_r05_publication_between_count_and_rows_keeps_one_response_snapshot",
+        "test_r05_equal_price_order_is_stable_but_separate_pages_use_new_snapshots"
       ]
     },
     {
