@@ -1,5 +1,5 @@
-$ C:\Users\16178\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -X utf8 -I -c "import sys;sys.path.insert(0,sys.argv.pop(1));import campus_market;print('INSTALLED_PACKAGE',campus_market.__file__);from campus_market.cli import main;raise SystemExit(main())" D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\6491fa13347040dc962c3288d3dcf2ad\installed --db D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\6491fa13347040dc962c3288d3dcf2ad\installed-demo.db demo
-INSTALLED_PACKAGE D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\6491fa13347040dc962c3288d3dcf2ad\installed\campus_market\__init__.py
+$ C:\Users\16178\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -X utf8 -I -c "import sys;sys.path.insert(0,sys.argv.pop(1));import campus_market;print('INSTALLED_PACKAGE',campus_market.__file__);from campus_market.cli import main;raise SystemExit(main())" D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\903f46057f48426aa3ee2c1ae2708b72\installed --db D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\903f46057f48426aa3ee2c1ae2708b72\installed-demo.db demo
+INSTALLED_PACKAGE D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\903f46057f48426aa3ee2c1ae2708b72\installed\campus_market\__init__.py
 [
   {
     "step": "draft",

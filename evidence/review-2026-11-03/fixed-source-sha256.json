@@ -1,0 +1,14 @@
+{
+  "code/src/campus_market/catalog.py": "016d4cf9d875e2b805a0c5c25f902132187a8483338e50f7ed976ff97c363dd4",
+  "code/src/campus_market/cli.py": "4686afa6ee6b2026f2ad171ad9a331ca06ee83ee4401d56a5e0cef548fb7f4da",
+  "code/src/campus_market/core.py": "498c0f4231e30b140db81e6a5ce7a803d3c971effc7a38b88c67eb99a43165d3",
+  "code/src/campus_market/database.py": "06b44dc05aba08b923cd4415552770571eed9e2ca698711279ed5c506d54f2d4",
+  "code/src/campus_market/demo.py": "0e03b43835923cff5f77c30d542ebdddab50723228c548d46f3b38ce3e40385e",
+  "code/src/campus_market/models.py": "67a026b588064f2ba913c43bea9357c727d767518564ed445b49a314e1079c67",
+  "code/src/campus_market/queries.py": "78937326be6915366c4ab9dde13fdc4de8fbe9256674b93429c64558bff8ef81",
+  "code/src/campus_market/security.py": "9bb496c6a60eb3e74b6f835b8eecdd71816a7485e52d9024e10b890fb2124d25",
+  "code/src/campus_market/trade.py": "ec16dac624a3271e096dc2aee4c587f6360c076146ca8a97b5a6c580189b92bf",
+  "code/src/campus_market/validation.py": "b2fdf62628da171486bfd453b0a8638ef2db99d0ad96db9db6a4420d028ebf7b",
+  "code/src/campus_market/__init__.py": "3efea8b5207c72a9ff7602464920a06b674eff490aa3eec99504917d1f9084bc",
+  "code/src/campus_market/__main__.py": "d73e60c1018324b7000d9a1adfcc386ae7713d59be557e90fde4bd6d3c171e26"
+}

@@ -15,27 +15,27 @@
     },
     {
       "file": "src\\campus_market\\catalog.py",
-      "physical_lines": 183,
-      "nonblank_noncomment_lines": 159,
-      "token_bearing_lines_excluding_all_string_tokens": 146
+      "physical_lines": 191,
+      "nonblank_noncomment_lines": 167,
+      "token_bearing_lines_excluding_all_string_tokens": 154
     },
     {
       "file": "src\\campus_market\\cli.py",
-      "physical_lines": 162,
-      "nonblank_noncomment_lines": 146,
-      "token_bearing_lines_excluding_all_string_tokens": 119
+      "physical_lines": 168,
+      "nonblank_noncomment_lines": 152,
+      "token_bearing_lines_excluding_all_string_tokens": 125
     },
     {
       "file": "src\\campus_market\\core.py",
-      "physical_lines": 234,
-      "nonblank_noncomment_lines": 212,
-      "token_bearing_lines_excluding_all_string_tokens": 194
+      "physical_lines": 365,
+      "nonblank_noncomment_lines": 340,
+      "token_bearing_lines_excluding_all_string_tokens": 319
     },
     {
       "file": "src\\campus_market\\database.py",
-      "physical_lines": 97,
-      "nonblank_noncomment_lines": 91,
-      "token_bearing_lines_excluding_all_string_tokens": 21
+      "physical_lines": 111,
+      "nonblank_noncomment_lines": 103,
+      "token_bearing_lines_excluding_all_string_tokens": 32
     },
     {
       "file": "src\\campus_market\\demo.py",
@@ -45,15 +45,15 @@
     },
     {
       "file": "src\\campus_market\\models.py",
-      "physical_lines": 89,
-      "nonblank_noncomment_lines": 65,
-      "token_bearing_lines_excluding_all_string_tokens": 55
+      "physical_lines": 94,
+      "nonblank_noncomment_lines": 70,
+      "token_bearing_lines_excluding_all_string_tokens": 60
     },
     {
       "file": "src\\campus_market\\queries.py",
-      "physical_lines": 202,
-      "nonblank_noncomment_lines": 187,
-      "token_bearing_lines_excluding_all_string_tokens": 169
+      "physical_lines": 213,
+      "nonblank_noncomment_lines": 198,
+      "token_bearing_lines_excluding_all_string_tokens": 180
     },
     {
       "file": "src\\campus_market\\security.py",
@@ -63,12 +63,18 @@
     },
     {
       "file": "src\\campus_market\\trade.py",
-      "physical_lines": 273,
-      "nonblank_noncomment_lines": 237,
-      "token_bearing_lines_excluding_all_string_tokens": 218
+      "physical_lines": 284,
+      "nonblank_noncomment_lines": 248,
+      "token_bearing_lines_excluding_all_string_tokens": 229
+    },
+    {
+      "file": "src\\campus_market\\validation.py",
+      "physical_lines": 73,
+      "nonblank_noncomment_lines": 64,
+      "token_bearing_lines_excluding_all_string_tokens": 61
     }
   ],
-  "physical_total": 1366,
-  "nonblank_noncomment_total": 1205,
-  "conservative_token_line_total": 1021
+  "physical_total": 1625,
+  "nonblank_noncomment_total": 1450,
+  "conservative_token_line_total": 1259
 }

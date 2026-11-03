@@ -54,3 +54,20 @@ https://docs.python.org/3.12/library/sqlite3.html
 https://setuptools.pypa.io/en/stable/build_meta.html
 https://pip.pypa.io/en/stable/cli/pip_wheel/
 https://docs.astral.sh/ruff/installation/
+
+
+Stage 5 — supplied review -> regressions -> repairs (0.1.1)
+User input: an actual supplied review listing R01-R07 and N01, explicitly marked
+confirmed but not repaired. The original text is preserved without editing.
+Reproduction: copied the supplied probe runner into a separate working directory,
+re-executed all eight baseline probes and the 22 baseline tests before any source
+edit. Probe runner's mirror byte comparison is false due to checkout newlines;
+its before/after source hashes are unchanged, and all eight probes reproduced.
+Repairs: strict service-boundary contracts for every CLI operation; mandatory
+transaction keys; finally session cleanup; bounded failure audit retries with
+explicit unavailable status; safe INTERNAL_ERROR handling; explicit read snapshot;
+aggregate member context retained across close operations; normalized category.
+Added 16 review regression tests without inheriting and re-running the original
+22 tests twice. Rebuilt version 0.1.1 to distinguish the corrected wheel.
+The supplied review is evidence, not proof that all future changes were personally
+reviewed. No experiment report prose is generated; this is a technical change log.

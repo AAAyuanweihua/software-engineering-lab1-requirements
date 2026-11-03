@@ -1,0 +1,84 @@
+{
+  "baseline_commit": "083f3b77a41221f345c56de8e60fa2f8a33f7ded",
+  "version": "0.1.1",
+  "original_tests": 22,
+  "new_regression_tests": 16,
+  "total_tests": 38,
+  "findings": [
+    {
+      "finding": "R01",
+      "baseline": "reproduced before edits",
+      "current": "regression passed",
+      "tests": [
+        "test_r01_review_requires_real_boolean_without_side_effects",
+        "test_r01_seller_decision_requires_real_boolean"
+      ]
+    },
+    {
+      "finding": "R02",
+      "baseline": "reproduced before edits",
+      "current": "regression passed",
+      "tests": [
+        "test_r02_all_query_parameter_types_and_sqlite_offset_bounds",
+        "test_r02_shell_continues_after_bad_json_type_and_logs_out",
+        "test_r02_finally_cleans_session_on_unexpected_adapter_error"
+      ]
+    },
+    {
+      "finding": "R03",
+      "baseline": "reproduced before edits",
+      "current": "regression passed",
+      "tests": [
+        "test_r03_persistent_lock_returns_business_error_and_truthful_audit_status",
+        "test_r03_lock_released_during_audit_persists_failure"
+      ]
+    },
+    {
+      "finding": "R04",
+      "baseline": "reproduced before edits",
+      "current": "regression passed",
+      "tests": [
+        "test_r04_market_sqlite_and_runtime_faults_have_rollback_and_safe_audit"
+      ]
+    },
+    {
+      "finding": "R05",
+      "baseline": "reproduced before edits",
+      "current": "regression passed",
+      "tests": [
+        "test_r05_takedown_between_count_and_rows_keeps_one_response_snapshot",
+        "test_r05_publication_between_count_and_rows_keeps_one_response_snapshot"
+      ]
+    },
+    {
+      "finding": "R06",
+      "baseline": "reproduced before edits",
+      "current": "regression passed",
+      "tests": [
+        "test_r06_restrict_includes_closed_reservation_and_cancellation",
+        "test_r06_admin_disabled_close_preserves_aggregate_transition_audit",
+        "test_r06_cancel_rejection_and_withdrawal_audit_marks_and_epoch"
+      ]
+    },
+    {
+      "finding": "R07",
+      "baseline": "reproduced before edits",
+      "current": "regression passed",
+      "tests": [
+        "test_r07_all_required_receipt_operations_reject_invalid_keys_before_write",
+        "test_r07_valid_receipt_replay_and_cross_action_collision"
+      ]
+    },
+    {
+      "finding": "N01",
+      "baseline": "reproduced before edits",
+      "current": "regression passed",
+      "tests": [
+        "test_n01_trimmed_category_is_validated_and_persisted_consistently"
+      ]
+    }
+  ],
+  "full_build_install_demo": "PASS",
+  "human_acceptance_of_fixed_revision": "pending",
+  "note": "Original review is preserved. Automated repair evidence is not a human acceptance or an AI-authored experiment report."
+}

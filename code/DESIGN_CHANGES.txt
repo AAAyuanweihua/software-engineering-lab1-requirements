@@ -31,3 +31,20 @@ Implementation decisions and differences from lab2 (technical change log)
 10. Test results verify the cases executed in this environment only. The lab1
     10000-product/20-user query-performance target and five-new-user usability test
     have not been executed and must not be claimed as passed.
+
+
+0.1.1 review repair additions:
+11. Public-service signatures have explicit runtime contracts, not CLI-only coercion.
+    Booleans are exact bool values; required transaction keys reject None and
+    missing/non-string values. Wrong types fail before any business mutation.
+12. Multi-read responses share a short explicit read transaction in WAL mode.
+    This guarantees one-response consistency, not a frozen multi-page session.
+13. Failure audit tries twice with 100ms busy waits and 20ms between attempts.
+    MarketError retains its business code and reports persisted/unavailable plus
+    a diagnostic ID. Unavailable audit emits a sanitized stderr/log diagnostic;
+    there is no claimed reliable offline queue or fabricated audit persistence.
+14. Unanticipated transaction exceptions become INTERNAL_ERROR after rollback;
+    only safe error type/action/diagnostic IDs are logged, not exception messages.
+15. Audit context captures associated reservation/application IDs before mutation
+    and re-reads the same members after mutation, so CLOSED records do not vanish
+    from RESTRICT/CLOSE_DISABLED audits. State snapshots omit unrelated descriptions.

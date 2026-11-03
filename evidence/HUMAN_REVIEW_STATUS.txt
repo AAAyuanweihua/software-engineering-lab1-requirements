@@ -7,3 +7,11 @@ No claim is made that the student has read every line or approved the final code
 No precise personal review time is invented. The experiment report body must be
 independently written by the student; it is intentionally absent from this source
 and evidence package. This is not a ready-to-submit final course ZIP.
+
+
+Review intake update (2026-11-03, user-supplied material):
+The user supplied a baseline 0.1.0 review describing 110 code segments and eight
+findings. Its text and independently re-executed probes are archived under
+review-2026-11-03. This updates the earlier stage's review situation; it is not
+an acceptance of the subsequently changed 0.1.1 source. Final human acceptance
+of these repairs and the student's independently written report remain pending.
