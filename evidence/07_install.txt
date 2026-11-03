@@ -1,0 +1,4 @@
+$ C:\Users\16178\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m pip install --no-index --no-deps --target D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\6491fa13347040dc962c3288d3dcf2ad\installed D:\软件工程\实验3_241220055_王陈钰\code\dist\campus_market_lab3-0.1.0-py3-none-any.whl
+Processing .\dist\campus_market_lab3-0.1.0-py3-none-any.whl
+Installing collected packages: campus-market-lab3
+Successfully installed campus-market-lab3-0.1.0

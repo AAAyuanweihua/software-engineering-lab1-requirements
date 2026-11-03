@@ -1,0 +1,33 @@
+Implementation decisions and differences from lab2 (technical change log)
+
+1. Python 3.12 terminal application, no mandatory GUI. The student explicitly chose
+   “采纳，优先交易闭环与测试”. Existing draw.io screens remain design references,
+   not an implemented GUI and not counted as generated application code.
+2. SQLite replaces PostgreSQL. BEGIN IMMEDIATE serializes all writers, whereas
+   the design used row-level FOR UPDATE. Partial unique indexes still enforce one
+   active reservation. Real separate-process tests exercise the chosen mechanism;
+   their success is not a scalability claim or a PostgreSQL test result.
+3. Money is persisted as integer cents. Decimal parses/validates input; no float
+   rounding. UTC timestamps are converted from half-open Beijing query boundaries.
+4. Product, Reservation, Cancellation, ReviewRecord and RequestReceipt map to
+   relational records and service methods, not one Python class per UML box.
+   User is an immutable dataclass, state values are enums, MarketError is a typed
+   business error, Core/Catalog/Trade/Market separate transaction and domain services.
+5. Cancellation status CLOSED is added for administrative closing. Without it a
+   closed reservation could still have a pending cancellation; both now close in
+   the same transaction. Histories remain saved.
+6. Current delivery epoch rejects old-page confirmations after rejection/withdrawal
+   of cancellation. Successful receipts return their original result on retry;
+   replay never performs a fresh transition or changes the completion time.
+7. The local CLI stores session tokens only in memory. Database session entries
+   store hashes, expire after twelve hours, and are removed on logout/suspension.
+   A failed account switch clears the previous session identity.
+8. Business success, receipt and success audit are atomic. Failure audit is appended
+   after rollback. Success logs include sanitized before/after state snapshots.
+   SQLite triggers prevent application-level log updates/deletes. No automatic log
+   retention purge is implemented; logs are retained until deliberate local upkeep.
+9. Fault injection is an explicit constructor seam for tests, not a public command.
+   This allows deterministic rollback verification without hidden production modes.
+10. Test results verify the cases executed in this environment only. The lab1
+    10000-product/20-user query-performance target and five-new-user usability test
+    have not been executed and must not be claimed as passed.

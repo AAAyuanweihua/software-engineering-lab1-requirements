@@ -1,0 +1,9 @@
+Actual student statements
+
+Implementation decision: 采纳，优先交易闭环与测试
+Line-by-line review status: 尚未逐行阅读，先完成构建与证据
+
+No claim is made that the student has read every line or approved the final code.
+No precise personal review time is invented. The experiment report body must be
+independently written by the student; it is intentionally absent from this source
+and evidence package. This is not a ready-to-submit final course ZIP.

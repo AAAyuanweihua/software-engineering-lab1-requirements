@@ -1,0 +1,56 @@
+Technical AI-development record, not experiment-report prose
+
+Context: user provided lab3 instructions and a two-page PDF. PDF was visually read
+because text extraction returned empty. Both prohibit AI assistance in report
+writing. No experiment report body or report outline has been generated.
+
+Stage 1 — UML -> types/schema/contracts
+Input: lab2-report-v2 class diagram and two-party confirmation sequence; lab1 rules.
+Output: domain values, explicit transaction contracts and constrained SQLite schema.
+Decision requested: Python CLI + SQLite, prioritize transaction loop and testing.
+Student exact reply: 采纳，优先交易闭环与测试
+Git: lab3-contracts. Replaces row-level PostgreSQL locking with SQLite write
+serialization; change is documented, not represented as an unchanged design.
+
+Stage 2 — contracts -> implementation
+Output: shared authorization/receipt/audit transaction entry, product workflows,
+reservation/cancellation/confirmation, queries/statistics, CLI and demo.
+Initial executable demo exercised duplicate reservation, one-party confirmation,
+rejected cancellation clearing flags, stale-epoch rejection and completion retry.
+Git: lab3-ai-draft. This is the first executable application before final tests/style.
+
+Stage 3 — style and behavior checks
+Ruff first reported 32 import/line-length errors. Raw output: ruff-before.txt.
+Applied import sorting and formatting, then checked rather than disabling the rules.
+The first test command failed to open SQLite files in the sandbox's redirected
+temporary directory. Changing TEMP/TMP to a writable workspace directory allowed
+the same tests to execute; this was an environment problem, not a passed test.
+An initial 20-test run passed. Tests were extended with failed-account-switch and
+real-process moderation/completion contention. Final suite has 22 test methods;
+the fault test includes 10 creation and 10 cancellation injections internally.
+
+Stage 4 — AI review, fixes, regression and packaging
+Found: failed login while switching accounts retained the previous shell token.
+Fix: invalidate the previous session and clear token before attempting new login;
+added regression test. Found: successful audit only contained final result.
+Fix: add before/after sanitized snapshots and real object identifiers; assert both
+states in the audit test. No deliberate errors were introduced to manufacture edits.
+Installed demo used -I isolation, which ignored PYTHONIOENCODING on Windows.
+Fix: explicit -X utf8 while keeping -I; original raw output is preserved as
+08_installed_demo-before-utf8.txt. Final installed demo output is UTF-8.
+Build uses setuptools/PyPA wheel. Installed package is run with -I to ensure the
+source checkout is not accidentally imported. Raw outputs are kept by stage.
+
+Human code review request:
+AI: 实现代码已在 D:\软件工程\实验3_241220055_王陈钰\code\src\campus_market。
+课程希望你逐行阅读即将采用的代码：目前你是否已实际阅读，有哪些要调整的地方？
+尚未阅读可直接说明，我会如实记录，不把自动测试当成人工审查。
+Student exact reply: 尚未逐行阅读，先完成构建与证据
+Status: human line-by-line review remains pending. Automated tests do not substitute
+for it. No fabricated review, screenshot, test score or personal reflection.
+
+Reference sources used for tooling (student may independently decide what to cite):
+https://docs.python.org/3.12/library/sqlite3.html
+https://setuptools.pypa.io/en/stable/build_meta.html
+https://pip.pypa.io/en/stable/cli/pip_wheel/
+https://docs.astral.sh/ruff/installation/

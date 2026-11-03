@@ -1,0 +1,73 @@
+校园二手交易系统：开发与运行说明（不是实验报告）
+
+运行要求：Python >=3.12。运行时只依赖标准库，不需要数据库服务器。
+本地已有环境可使用：
+C:\Users\16178\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe
+以下把解释器简写为python；Windows推荐加-X utf8，避免重定向中文输出乱码。
+
+快速运行源码（PowerShell，先进入code目录）：
+  $env:PYTHONPATH = Join-Path (Get-Location) 'src'
+  python -X utf8 -m campus_market --db .\my-demo.db demo
+demo必须使用不存在的新数据库路径；不会覆盖已有库。每次运行创建随机密码，
+输出不含密码或会话，不建议把演示库当作人工使用的正式账号库。
+
+人工操作（独立新库）：
+  python -X utf8 -m campus_market --db .\market.db init-admin --account manager
+  python -X utf8 -m campus_market --db .\market.db register --account seller
+  python -X utf8 -m campus_market --db .\market.db register --account buyer
+  python -X utf8 -m campus_market --db .\market.db shell
+密码通过getpass读取，不作为命令行参数保存。管理员只能初始化一次，后续新管理
+账号由已登录管理员执行create-admin。普通注册无法选择管理员。
+
+shell内：
+  login seller
+  help
+  create_product {"title":"线代教材","category":"教材","price":"35.00","description":"无缺页","image_ref":"book.jpg"}
+  submit_product {"product_id":"替换成结果中的商品ID"}
+  logout
+  login manager
+  list_products {"scope":"admin","status":"REVIEWING"}
+  review_product {"product_id":"同一ID","version":2,"approve":true}
+  logout
+  login buyer
+  list_products {}
+  reserve {"product_id":"同一ID","version":3,"key":"reserve-1"}
+参数version以实际查询结果为准。通过list_reservations {}取得交易ID，通过
+get_reservation {"reservation_id":"ID"}查看最新epoch和申请历史。
+  seller_decision {"reservation_id":"ID","accept":true,"key":"accept-1"}
+  confirm {"reservation_id":"ID","epoch":1,"key":"confirm-1"}
+接受由卖家账号执行，完成确认分别在买家和卖家账号中执行，不能代确认。
+key：同一次操作重试必须用原键与原参数；新操作必须换新键。
+每次只输入一行JSON；help中的换行仅为阅读展示。
+
+统计和日志示例：
+  seller_stats {"start":"2026-11-01","end":"2026-12-01"}
+  category_stats {"status":"PUBLISHED"}
+  logs {"action":"RESERVE","start":"2026-11-01"}
+分类统计和日志仅管理员可用；金额输出整数分，统计不是支付到账记录。
+
+构建与检查（code目录）：
+  python -m pip install setuptools ruff
+  python -X utf8 tools\build.py
+若Ruff安装在独立--target目录，使用tools\build.py --ruff-path 该目录。
+流水线：compileall -> Ruff lint -> Ruff format --check -> unittest ->
+pip wheel（无网络、无运行依赖）-> 安装wheel到隔离目录 -> -I模式运行安装包演示。
+若只跑测试：
+  $env:PYTHONPATH = Join-Path (Get-Location) 'src'
+  python -X utf8 -m unittest discover -s tests -v
+若系统TEMP权限受限，请将TEMP和TMP指向有写权限的本地临时目录。
+
+构建输出：code/dist/campus_market_lab3-0.1.0-py3-none-any.whl
+安装包无需构建依赖：
+  python -m pip install --no-index --no-deps .\dist\campus_market_lab3-0.1.0-py3-none-any.whl
+  python -X utf8 -m campus_market --db .\installed-demo.db demo
+
+已实现：注册登录、资源授权、草稿提交审核、修改重审、下架恢复、违规治理、
+多条件查询与分页、预约防重、卖家确认、两阶段取消、双方确认、价格快照、
+统计、只读审计、停用及在途关闭。
+原型边界：命令行界面；分类为预置列表；图片只保存受限文件名引用，不上传或托管
+真实图片；不接支付/物流/聊天/评价，不做自动超时释放。数据库文件由本机所有者
+掌控，应用权限不用于防御本机管理员直接修改文件；不是可公开联网的生产服务。
+
+未完成课程事项：本人仍需逐行阅读采用的代码，独立撰写实验报告正文并导出PDF，
+最后把本人报告与UML、code目录按任务书打包。不得把本说明或AI记录冒充本人报告。

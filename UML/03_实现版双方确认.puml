@@ -1,0 +1,41 @@
+@startuml
+title 实验三实现：双方确认时序（Python + SQLite）
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam shadowing false
+actor 交易参与方 as Actor
+boundary 交易详情 as UI
+control TradeService as S
+database "SQLite / WAL" as DB
+Actor -> UI : 确认线下交付
+UI -> S : confirm(id, confirmationEpoch, requestKey)
+S -> S : 校验本人参与方，禁止管理员代确认
+S -> DB : BEGIN IMMEDIATE；序列化数据库写事务
+S -> DB : 核对回执、当前状态、epoch与取消申请
+alt 同key同摘要已有结果
+ DB --> S : 原回执
+ S -> DB : COMMIT
+ S --> UI : 原结果，不修改完成时间
+else 同key不同摘要
+ S -> DB : ROLLBACK
+ S --> UI : 409 重复键参数冲突
+else epoch过期 / 取消待处理 / 已关闭
+ S -> DB : ROLLBACK
+ S --> UI : 409 刷新当前交易状态
+else 合法确认
+ S -> DB : 保存本方标记
+ alt 只有一方确认
+  S -> DB : 保持商品与预约已确认
+ else 双方均确认
+  S -> DB : 原子更新已完成与唯一完成时间
+ end
+ S -> DB : 保存成功审计与回执；COMMIT
+ S --> UI : 当前确认进度
+end
+note over S,DB
+取消拒绝/撤回清空双方标记并递增epoch。
+旧轮次请求即使再次到达也被拒绝。
+与违规处置共用写事务，以先提交成功者为准。
+数据库异常回滚，失败审计在回滚后独立记录。
+end note
+@enduml

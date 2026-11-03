@@ -1,0 +1,9 @@
+﻿UML元素,实际实现位置,持久化/机制,验证用例
+User,models.py User；core.py register/login/identity,users、sessions,test_registration_and_credentials
+Product,catalog.py Catalog,products、categories,test_price_change_invalidates_old_page
+Reservation,trade.py Trade.reserve/confirm,reservations,test_cross_process_last_item_competition
+Cancellation,trade.py request_cancellation/decide_cancellation,cancellations,test_cancellation_blocks_completion_and_resets_epoch
+ReviewRecord,catalog.py review_product,reviews,test_review_rejection_and_resubmission
+AuditLog,core.py audit/snapshot；queries.py logs,audit_logs及不可改删触发器,test_audit_permission_filters_and_append_only
+RequestReceipt,core.py write,"receipts(actor_id,request_key)",test_duplicate_request_and_key_misuse
+层间交互,CLI -> Market -> Trade/Catalog/Core -> Database,BEGIN IMMEDIATE原子提交,test_ten_faults_each_creation_and_cancellation

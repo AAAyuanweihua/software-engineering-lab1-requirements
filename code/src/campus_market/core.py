@@ -67,6 +67,33 @@ class Core:
             ),
         )
 
+    @staticmethod
+    def snapshot(connection, object_id):
+        """Capture audit state without password hashes, sessions or business descriptions."""
+        state = {}
+        columns = {
+            "products": "id,status,version,restricted",
+            "reservations": (
+                "id,product_id,status,epoch,buyer_confirmed,seller_confirmed,completed_at"
+            ),
+            "cancellations": "id,reservation_id,status",
+            "users": "id,enabled,admin",
+        }
+        for table, selection in columns.items():
+            row = connection.execute(
+                f"SELECT {selection} FROM {table} WHERE id=?", (object_id,)
+            ).fetchone()
+            if row:
+                state[table] = dict(row)
+        reservation = state.get("reservations")
+        if reservation:
+            product = connection.execute(
+                "SELECT id,status,version,restricted FROM products WHERE id=?",
+                (reservation["product_id"],),
+            ).fetchone()
+            state["products"] = dict(product)
+        return state
+
     def failure(self, actor_id: str | None, action: str, object_id: str, code: str) -> None:
         """Record a failed operation only after its business transaction rolls back."""
         with closing(self.database.connect()) as connection:
@@ -110,8 +137,15 @@ class Core:
                             )
                             connection.commit()
                             return json.loads(previous["result"])
+                    before = self.snapshot(connection, object_id)
                     result = operation(connection, actor)
-                    self.audit(connection, actor.id, action, object_id, "SUCCESS", result)
+                    target = object_id or result.get("id", "")
+                    detail = {
+                        "before": before,
+                        "after": self.snapshot(connection, target),
+                        "result": result,
+                    }
+                    self.audit(connection, actor.id, action, target, "SUCCESS", detail)
                     if key is not None:
                         connection.execute(
                             "INSERT INTO receipts VALUES (?,?,?,?)",

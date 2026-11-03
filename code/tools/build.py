@@ -117,6 +117,8 @@ def main():
         "08_installed_demo",
         [
             sys.executable,
+            "-X",
+            "utf8",
             "-I",
             "-c",
             script,

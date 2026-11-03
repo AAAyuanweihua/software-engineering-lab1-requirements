@@ -1,0 +1,10 @@
+$ C:\Users\16178\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m pip wheel --no-index --no-deps --no-build-isolation . --wheel-dir dist
+Processing .\.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: campus-market-lab3
+  Building wheel for campus-market-lab3 (pyproject.toml): started
+  Building wheel for campus-market-lab3 (pyproject.toml): finished with status 'done'
+  Created wheel for campus-market-lab3: filename=campus_market_lab3-0.1.0-py3-none-any.whl size=22758 sha256=2aaaa58f4563e7d2145f0df11f55489a3c488973d32f3fd37b8e498a36a65fba
+  Stored in directory: D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\6491fa13347040dc962c3288d3dcf2ad\pip-ephem-wheel-cache-g7diotxq\wheels\7c\30\28\4f926aa592c631aa538837b99f59d409bcb4491026d85a1d22
+Successfully built campus-market-lab3

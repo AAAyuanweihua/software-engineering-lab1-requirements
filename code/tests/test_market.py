@@ -1,5 +1,6 @@
 """Behavioral tests for cross-record invariants, authorization and actual contention."""
 
+import json
 import multiprocessing
 import secrets
 import sqlite3
@@ -434,6 +435,10 @@ class MarketTests(unittest.TestCase):
         self.assert_error("FORBIDDEN", self.market.logs, self.buyer)
         rows = self.market.logs(self.admin, actor_id=self.ids["buyer"], action="RESERVE")
         self.assertEqual(len(rows), 1)
+        detail = json.loads(rows[0]["detail"])
+        self.assertEqual(detail["before"]["products"]["status"], "PUBLISHED")
+        self.assertEqual(detail["after"]["products"]["status"], "RESERVED")
+        self.assertEqual(rows[0]["object_id"], product["id"])
         with closing(self.market.database.connect()) as connection:
             with self.assertRaises(sqlite3.IntegrityError):
                 connection.execute("DELETE FROM audit_logs")
