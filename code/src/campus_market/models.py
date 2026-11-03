@@ -41,10 +41,15 @@ class MarketError(Exception):
         super().__init__(message)
         self.code = code
         self.status = status
+        self.diagnostic_id = None
+        self.audit_status = None
 
     def as_dict(self) -> dict:
         """Expose a stable error envelope to the CLI and future GUI adapters."""
-        return {"error": self.code, "message": str(self), "status": self.status}
+        result = {"error": self.code, "message": str(self), "status": self.status}
+        if self.audit_status is not None:
+            result.update(audit_status=self.audit_status, diagnostic_id=self.diagnostic_id)
+        return result
 
 
 @dataclass(frozen=True)

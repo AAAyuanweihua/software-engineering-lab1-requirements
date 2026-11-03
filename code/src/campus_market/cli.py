@@ -115,22 +115,28 @@ class Shell:
     def run(self):
         """Remain usable after business errors, malformed JSON or wrong arguments."""
         print("校园二手交易系统：help查看命令；quit退出。仅线下交易，不处理支付。")
-        while True:
-            try:
-                line = input("market> ").strip()
-                if line in ("quit", "exit"):
+        try:
+            while True:
+                try:
+                    line = input("market> ").strip()
+                    if line in ("quit", "exit"):
+                        break
+                    if line:
+                        self.execute(line)
+                except MarketError as exc:
+                    output(exc.as_dict())
+                except (json.JSONDecodeError, ValueError):
+                    output({"error": "INVALID_INPUT", "message": "参数格式有误，请查看help"})
+                except (EOFError, KeyboardInterrupt):
+                    print("\n退出；业务数据已保存，未提交的操作不会生效。")
                     break
-                if line:
-                    self.execute(line)
-            except MarketError as exc:
-                output(exc.as_dict())
-            except (json.JSONDecodeError, TypeError, ValueError):
-                output({"error": "INVALID_INPUT", "message": "参数格式或类型有误，请查看help"})
-            except (EOFError, KeyboardInterrupt):
-                print("\n退出；业务数据已保存，未提交的操作不会生效。")
-                break
-        if self.token:
-            self.market.logout(self.token)
+        finally:
+            previous, self.token = self.token, ""
+            if previous:
+                try:
+                    self.market.logout(previous)
+                except MarketError as exc:
+                    output(exc.as_dict())
 
 
 def main():

@@ -57,9 +57,9 @@ pip wheel（无网络、无运行依赖）-> 安装wheel到隔离目录 -> -I模
   python -X utf8 -m unittest discover -s tests -v
 若系统TEMP权限受限，请将TEMP和TMP指向有写权限的本地临时目录。
 
-构建输出：code/dist/campus_market_lab3-0.1.0-py3-none-any.whl
+构建输出：code/dist/campus_market_lab3-0.1.1-py3-none-any.whl
 安装包无需构建依赖：
-  python -m pip install --no-index --no-deps .\dist\campus_market_lab3-0.1.0-py3-none-any.whl
+  python -m pip install --no-index --no-deps .\dist\campus_market_lab3-0.1.1-py3-none-any.whl
   python -X utf8 -m campus_market --db .\installed-demo.db demo
 
 已实现：注册登录、资源授权、草稿提交审核、修改重审、下架恢复、违规治理、

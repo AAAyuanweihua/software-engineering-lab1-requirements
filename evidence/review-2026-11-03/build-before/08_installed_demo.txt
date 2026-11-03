@@ -1,0 +1,54 @@
+$ C:\Users\16178\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -X utf8 -I -c "import sys;sys.path.insert(0,sys.argv.pop(1));import campus_market;print('INSTALLED_PACKAGE',campus_market.__file__);from campus_market.cli import main;raise SystemExit(main())" D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\6491fa13347040dc962c3288d3dcf2ad\installed --db D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\6491fa13347040dc962c3288d3dcf2ad\installed-demo.db demo
+INSTALLED_PACKAGE D:\软件工程\实验3_241220055_王陈钰\code\.build-tmp\6491fa13347040dc962c3288d3dcf2ad\installed\campus_market\__init__.py
+[
+  {
+    "step": "draft",
+    "status": "DRAFT"
+  },
+  {
+    "step": "review",
+    "status": "PUBLISHED"
+  },
+  {
+    "step": "reserve_retry",
+    "same_result": true,
+    "price_cents": 3500
+  },
+  {
+    "step": "one_party",
+    "status": "CONFIRMED"
+  },
+  {
+    "step": "cancel_rejected",
+    "epoch": 2,
+    "flags": [
+      0,
+      0
+    ]
+  },
+  {
+    "step": "old_confirmation",
+    "error": "STALE_EPOCH"
+  },
+  {
+    "step": "completed",
+    "status": "COMPLETED",
+    "stable_time": true
+  },
+  {
+    "step": "post_completion_moderation",
+    "status": "COMPLETED",
+    "restricted": 1
+  },
+  {
+    "step": "seller_stats",
+    "completed_count": 1,
+    "total_cents": 3500,
+    "start_utc": "2019-12-31T16:00:00.000000+00:00",
+    "end_utc_exclusive": "2099-12-31T16:00:00.000000+00:00"
+  },
+  {
+    "step": "audit_count",
+    "count": 15
+  }
+]

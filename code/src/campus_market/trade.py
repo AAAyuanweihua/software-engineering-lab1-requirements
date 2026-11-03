@@ -2,6 +2,7 @@
 
 from campus_market.catalog import Catalog
 from campus_market.models import new_id, now, required
+from campus_market.validation import validated
 
 
 class Trade(Catalog):
@@ -16,6 +17,7 @@ class Trade(Catalog):
             (reservation_id,),
         )
 
+    @validated
     def reserve(self, token, product_id, version, key):
         """Create a price snapshot and occupancy in the same transaction."""
 
@@ -45,6 +47,7 @@ class Trade(Catalog):
 
         return self.write(token, "RESERVE", product_id, {"version": version}, operation, key)
 
+    @validated
     def seller_decision(self, token, reservation_id, accept, key):
         """The product seller alone accepts/rejects a pending reservation."""
 
@@ -67,6 +70,7 @@ class Trade(Catalog):
             token, "SELLER_DECISION", reservation_id, {"accept": accept}, operation, key
         )
 
+    @validated
     def cancel_pending(self, token, reservation_id, key):
         """Before acceptance the buyer may release occupancy unilaterally."""
 
@@ -85,6 +89,7 @@ class Trade(Catalog):
 
         return self.write(token, "CANCEL_PENDING", reservation_id, {}, operation, key)
 
+    @validated
     def request_cancellation(self, token, reservation_id, reason, key):
         """A pending cancellation blocks delivery confirmation, including single-party progress."""
         reason = required(reason, "取消原因", 500)
@@ -107,6 +112,7 @@ class Trade(Catalog):
             token, "REQUEST_CANCEL", reservation_id, {"reason": reason}, operation, key
         )
 
+    @validated
     def decide_cancellation(self, token, cancellation_id, decision, key):
         """Rejection/withdrawal start a new delivery-confirmation epoch."""
         self.require(
@@ -149,6 +155,7 @@ class Trade(Catalog):
             token, "DECIDE_CANCEL", cancellation_id, {"decision": decision}, operation, key
         )
 
+    @validated
     def confirm(self, token, reservation_id, epoch, key):
         """Only the actual buyer/seller confirms, and only in the current epoch."""
 
@@ -194,6 +201,7 @@ class Trade(Catalog):
             (product_id,),
         )
 
+    @validated
     def restrict(self, token, product_id, reason):
         """Moderation and completion share the same database writer serialization."""
         reason = required(reason, "违规原因", 500)
@@ -210,6 +218,7 @@ class Trade(Catalog):
 
         return self.write(token, "RESTRICT", product_id, {"reason": reason}, operation, admin=True)
 
+    @validated
     def unrestrict(self, token, product_id, reason):
         """Removing a restriction does not publish or revive a completed product."""
         reason = required(reason, "解除原因", 500)
@@ -226,6 +235,7 @@ class Trade(Catalog):
             token, "UNRESTRICT", product_id, {"reason": reason}, operation, admin=True
         )
 
+    @validated
     def disable_user(self, token, user_id, reason):
         """Suspend new activity and revoke sessions; outstanding history is retained."""
         reason = required(reason, "停用原因", 500)
@@ -239,6 +249,7 @@ class Trade(Catalog):
 
         return self.write(token, "DISABLE", user_id, {"reason": reason}, operation, admin=True)
 
+    @validated
     def close_disabled_trade(self, token, reservation_id, reason):
         """An administrator may release an unfinished trade with a suspended participant."""
         reason = required(reason, "关闭原因", 500)

@@ -1,16 +1,19 @@
 """Permission-aware reads and exact, half-open-window reporting."""
 
-from contextlib import closing
 from datetime import UTC, datetime, timedelta, timezone
 
+from campus_market.database import read_transaction
 from campus_market.models import MarketError, ProductStatus, price_cents
 from campus_market.trade import Trade
+from campus_market.validation import validated
 
 BEIJING = timezone(timedelta(hours=8))
 
 
 def utc_boundary(value: str) -> str:
     """Interpret naive dates/times as Beijing, then normalize to stored UTC precision."""
+    if not isinstance(value, str):
+        raise MarketError("INVALID_TIME", "日期须为ISO字符串", 422)
     try:
         instant = datetime.fromisoformat(value)
     except ValueError as exc:
@@ -23,6 +26,7 @@ def utc_boundary(value: str) -> str:
 class Market(Trade):
     """Public facade for presentation and tests, with fresh authorization per read."""
 
+    @validated
     def list_products(
         self,
         token="",
@@ -44,7 +48,7 @@ class Market(Trade):
         }
         self.require(order in sorts, "INVALID_SORT", "排序方式无效", 422)
         conditions, args = [], []
-        with closing(self.database.connect()) as connection:
+        with read_transaction(self.database) as connection:
             actor = self.identity(connection, token) if token else None
             if scope == "public":
                 conditions.extend(["p.status='PUBLISHED'", "p.restricted=0", "u.enabled=1"])
@@ -88,9 +92,10 @@ class Market(Trade):
                 "page_size": 20,
             }
 
+    @validated
     def get_product(self, product_id, token=""):
         """Do not leak another seller's non-public draft by direct identifier."""
-        with closing(self.database.connect()) as connection:
+        with read_transaction(self.database) as connection:
             product = self.product(connection, product_id)
             actor = self.identity(connection, token) if token else None
             public = product["status"] == "PUBLISHED" and not product["restricted"]
@@ -102,9 +107,10 @@ class Market(Trade):
             self.require(bool(public or own), "NOT_FOUND", "商品不存在或不可访问", 404)
             return product
 
+    @validated
     def get_reservation(self, token, reservation_id):
         """A participant can read their own history; administrators can govern it."""
-        with closing(self.database.connect()) as connection:
+        with read_transaction(self.database) as connection:
             actor = self.identity(connection, token)
             reservation = self.reservation(connection, reservation_id)
             self.require(
@@ -122,9 +128,10 @@ class Market(Trade):
             ]
             return reservation
 
+    @validated
     def list_reservations(self, token):
         """Return only the current account's buying and selling business records."""
-        with closing(self.database.connect()) as connection:
+        with read_transaction(self.database) as connection:
             actor = self.identity(connection, token)
             rows = connection.execute(
                 "SELECT r.*,p.title,p.seller_id FROM reservations r "
@@ -134,11 +141,12 @@ class Market(Trade):
             )
             return [dict(row) for row in rows]
 
+    @validated
     def seller_stats(self, token, start, end):
         """Count completed deals once, by completion time and frozen reservation price."""
         start_utc, end_utc = utc_boundary(start), utc_boundary(end)
         self.require(start_utc < end_utc, "INVALID_RANGE", "结束时间必须晚于开始时间", 422)
-        with closing(self.database.connect()) as connection:
+        with read_transaction(self.database) as connection:
             actor = self.identity(connection, token)
             row = connection.execute(
                 "SELECT count(*) AS completed_count,coalesce(sum(r.price_cents),0) AS total_cents "
@@ -149,9 +157,10 @@ class Market(Trade):
             ).fetchone()
             return {**dict(row), "start_utc": start_utc, "end_utc_exclusive": end_utc}
 
+    @validated
     def category_stats(self, token, status=None):
         """Count products, not joined reservation history; default includes all states."""
-        with closing(self.database.connect()) as connection:
+        with read_transaction(self.database) as connection:
             actor = self.identity(connection, token)
             self.require(actor.admin, "FORBIDDEN", "仅管理员可查询分类统计", 403)
             if status:
@@ -164,6 +173,7 @@ class Market(Trade):
             )
             return [dict(row) for row in rows]
 
+    @validated
     def logs(self, token, start=None, end=None, actor_id=None, action=None):
         """Administrator-only read API; no application method updates/deletes logs."""
         conditions, args = [], []
@@ -177,7 +187,7 @@ class Market(Trade):
             if value:
                 conditions.append(column + "=?")
                 args.append(value)
-        with closing(self.database.connect()) as connection:
+        with read_transaction(self.database) as connection:
             actor = self.identity(connection, token)
             self.require(actor.admin, "FORBIDDEN", "仅管理员可查操作日志", 403)
             where = " WHERE " + " AND ".join(conditions) if conditions else ""
@@ -189,9 +199,10 @@ class Market(Trade):
                 )
             ]
 
+    @validated
     def users(self, token):
         """Management listing excludes password hashes and session credentials."""
-        with closing(self.database.connect()) as connection:
+        with read_transaction(self.database) as connection:
             actor = self.identity(connection, token)
             self.require(actor.admin, "FORBIDDEN", "仅管理员可查用户列表", 403)
             return [

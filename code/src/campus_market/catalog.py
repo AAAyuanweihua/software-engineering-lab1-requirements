@@ -4,6 +4,7 @@ from pathlib import PurePath
 
 from campus_market.core import Core
 from campus_market.models import new_id, now, price_cents, required
+from campus_market.validation import validated
 
 
 class Catalog(Core):
@@ -27,10 +28,12 @@ class Catalog(Core):
             (state, now(), product_id),
         )
 
+    @validated
     def create_product(self, token, title, category, price, description, image_ref):
         """Save a complete draft with image-reference metadata (no image hosting)."""
         return self._save_product(token, None, title, category, price, description, image_ref)
 
+    @validated
     def edit_product(self, token, product_id, title, category, price, description, image_ref):
         """Editing published details removes the item from public search until reapproval."""
         return self._save_product(token, product_id, title, category, price, description, image_ref)
@@ -43,6 +46,7 @@ class Catalog(Core):
             "image_ref": required(image_ref, "图片文件名", 120),
             "price_cents": price_cents(price),
         }
+        category = fields["category"]
         image = fields["image_ref"]
         self.require(
             PurePath(image).name == image
@@ -107,6 +111,7 @@ class Catalog(Core):
             operation,
         )
 
+    @validated
     def submit_product(self, token, product_id):
         """Only unrestricted drafts enter the moderation queue."""
 
@@ -122,6 +127,7 @@ class Catalog(Core):
 
         return self.write(token, "SUBMIT", product_id, {}, operation)
 
+    @validated
     def review_product(self, token, product_id, version, approve, reason=""):
         """Review the current submitted version; rejection requires a reason."""
         if not approve:
@@ -156,6 +162,7 @@ class Catalog(Core):
             admin=True,
         )
 
+    @validated
     def take_down(self, token, product_id):
         """Sellers cannot use ordinary takedown to bypass an active transaction."""
 
@@ -167,6 +174,7 @@ class Catalog(Core):
 
         return self.write(token, "TAKE_DOWN", product_id, {}, operation)
 
+    @validated
     def restore_draft(self, token, product_id):
         """Restoration never publishes directly and never revives completed items."""
 

@@ -1,0 +1,1 @@
+$ C:\Users\16178\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe -m compileall -q src

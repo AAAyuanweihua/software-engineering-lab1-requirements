@@ -7,6 +7,7 @@ import platform
 import sqlite3
 import subprocess
 import sys
+import tomllib
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
@@ -91,7 +92,10 @@ def main():
             "dist",
         ],
     )
-    wheel = next((root / "dist").glob("campus_market_lab3-0.1.0-*.whl"))
+    version = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+        "version"
+    ]
+    wheel = next((root / "dist").glob(f"campus_market_lab3-{version}-*.whl"))
     site = scratch / "installed"
     run(
         "07_install",

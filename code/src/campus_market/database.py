@@ -1,7 +1,7 @@
 """SQLite schema and connection factory, with constraints as a concurrency backstop."""
 
 import sqlite3
-from contextlib import closing
+from contextlib import closing, contextmanager
 from pathlib import Path
 
 SCHEMA = """
@@ -72,6 +72,20 @@ CREATE INDEX IF NOT EXISTS product_filter
 CREATE INDEX IF NOT EXISTS buyer_reservations ON reservations(buyer_id,status);
 CREATE INDEX IF NOT EXISTS audit_filter ON audit_logs(created_at,actor_id,action);
 """
+
+
+@contextmanager
+def read_transaction(database):
+    """Keep authorization and all SELECTs for one response in one short WAL snapshot."""
+    with closing(database.connect()) as connection:
+        connection.execute("BEGIN")
+        try:
+            yield connection
+        except Exception:
+            connection.execute("ROLLBACK")
+            raise
+        else:
+            connection.execute("COMMIT")
 
 
 class Database:

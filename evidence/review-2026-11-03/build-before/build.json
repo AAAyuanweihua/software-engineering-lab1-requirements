@@ -1,0 +1,117 @@
+{
+  "started_at_utc": "2026-11-03T13:34:09.373093+00:00",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "sqlite": "3.53.1",
+  "stages": [
+    {
+      "name": "01_compile",
+      "exit_code": 0
+    },
+    {
+      "name": "02_ruff_version",
+      "exit_code": 0
+    },
+    {
+      "name": "03_lint",
+      "exit_code": 0
+    },
+    {
+      "name": "04_format",
+      "exit_code": 0
+    },
+    {
+      "name": "05_tests",
+      "exit_code": 0
+    },
+    {
+      "name": "06_wheel",
+      "exit_code": 0
+    },
+    {
+      "name": "07_install",
+      "exit_code": 0
+    },
+    {
+      "name": "08_installed_demo",
+      "exit_code": 0
+    }
+  ],
+  "source_metrics": {
+    "scope": "application src/campus_market/*.py only; no GUI-generated code",
+    "files": [
+      {
+        "file": "src\\campus_market\\__init__.py",
+        "physical_lines": 3,
+        "nonblank_noncomment_lines": 2,
+        "token_bearing_lines_excluding_all_string_tokens": 1
+      },
+      {
+        "file": "src\\campus_market\\__main__.py",
+        "physical_lines": 5,
+        "nonblank_noncomment_lines": 3,
+        "token_bearing_lines_excluding_all_string_tokens": 2
+      },
+      {
+        "file": "src\\campus_market\\catalog.py",
+        "physical_lines": 183,
+        "nonblank_noncomment_lines": 159,
+        "token_bearing_lines_excluding_all_string_tokens": 146
+      },
+      {
+        "file": "src\\campus_market\\cli.py",
+        "physical_lines": 162,
+        "nonblank_noncomment_lines": 146,
+        "token_bearing_lines_excluding_all_string_tokens": 119
+      },
+      {
+        "file": "src\\campus_market\\core.py",
+        "physical_lines": 234,
+        "nonblank_noncomment_lines": 212,
+        "token_bearing_lines_excluding_all_string_tokens": 194
+      },
+      {
+        "file": "src\\campus_market\\database.py",
+        "physical_lines": 97,
+        "nonblank_noncomment_lines": 91,
+        "token_bearing_lines_excluding_all_string_tokens": 21
+      },
+      {
+        "file": "src\\campus_market\\demo.py",
+        "physical_lines": 76,
+        "nonblank_noncomment_lines": 72,
+        "token_bearing_lines_excluding_all_string_tokens": 70
+      },
+      {
+        "file": "src\\campus_market\\models.py",
+        "physical_lines": 89,
+        "nonblank_noncomment_lines": 65,
+        "token_bearing_lines_excluding_all_string_tokens": 55
+      },
+      {
+        "file": "src\\campus_market\\queries.py",
+        "physical_lines": 202,
+        "nonblank_noncomment_lines": 187,
+        "token_bearing_lines_excluding_all_string_tokens": 169
+      },
+      {
+        "file": "src\\campus_market\\security.py",
+        "physical_lines": 42,
+        "nonblank_noncomment_lines": 31,
+        "token_bearing_lines_excluding_all_string_tokens": 26
+      },
+      {
+        "file": "src\\campus_market\\trade.py",
+        "physical_lines": 273,
+        "nonblank_noncomment_lines": 237,
+        "token_bearing_lines_excluding_all_string_tokens": 218
+      }
+    ],
+    "physical_total": 1366,
+    "nonblank_noncomment_total": 1205,
+    "conservative_token_line_total": 1021
+  },
+  "wheel": "campus_market_lab3-0.1.0-py3-none-any.whl",
+  "finished_at_utc": "2026-11-03T13:34:49.682304+00:00",
+  "success": true
+}

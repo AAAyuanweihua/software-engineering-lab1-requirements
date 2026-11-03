@@ -2,7 +2,9 @@
 
 import hashlib
 import json
+import logging
 import sqlite3
+import time
 from collections.abc import Callable
 from contextlib import closing
 from datetime import UTC, datetime, timedelta
@@ -10,8 +12,18 @@ from datetime import UTC, datetime, timedelta
 from campus_market.database import Database
 from campus_market.models import MarketError, User, new_id, now, required
 from campus_market.security import hash_password, new_token, token_digest, verify_password
+from campus_market.validation import validated
 
 Operation = Callable[[sqlite3.Connection, User], dict]
+IDEMPOTENT_ACTIONS = {
+    "RESERVE",
+    "SELLER_DECISION",
+    "CANCEL_PENDING",
+    "REQUEST_CANCEL",
+    "DECIDE_CANCEL",
+    "CONFIRM",
+}
+LOGGER = logging.getLogger(__name__)
 
 
 class Core:
@@ -68,7 +80,51 @@ class Core:
         )
 
     @staticmethod
-    def snapshot(connection, object_id):
+    def audit_context(connection, object_id):
+        """Find aggregate members before mutation so closed rows remain auditable afterward."""
+        product_ids, reservation_ids, cancellation_ids = set(), set(), set()
+        if connection.execute("SELECT 1 FROM products WHERE id=?", (object_id,)).fetchone():
+            product_ids.add(object_id)
+        reservation = connection.execute(
+            "SELECT id,product_id FROM reservations WHERE id=?", (object_id,)
+        ).fetchone()
+        cancellation = connection.execute(
+            "SELECT id,reservation_id FROM cancellations WHERE id=?", (object_id,)
+        ).fetchone()
+        if cancellation:
+            cancellation_ids.add(cancellation["id"])
+            reservation = connection.execute(
+                "SELECT id,product_id FROM reservations WHERE id=?",
+                (cancellation["reservation_id"],),
+            ).fetchone()
+        if reservation:
+            reservation_ids.add(reservation["id"])
+            product_ids.add(reservation["product_id"])
+        for product_id in product_ids:
+            reservation_ids.update(
+                row[0]
+                for row in connection.execute(
+                    "SELECT id FROM reservations WHERE product_id=? "
+                    "AND status IN ('PENDING','CONFIRMED','CANCEL_PENDING','COMPLETED')",
+                    (product_id,),
+                )
+            )
+        for reservation_id in reservation_ids:
+            cancellation_ids.update(
+                row[0]
+                for row in connection.execute(
+                    "SELECT id FROM cancellations WHERE reservation_id=? AND status='PENDING'",
+                    (reservation_id,),
+                )
+            )
+        return {
+            "products": product_ids,
+            "reservations": reservation_ids,
+            "cancellations": cancellation_ids,
+        }
+
+    @classmethod
+    def snapshot(cls, connection, object_id, context=None):
         """Capture audit state without password hashes, sessions or business descriptions."""
         state = {}
         columns = {
@@ -85,21 +141,66 @@ class Core:
             ).fetchone()
             if row:
                 state[table] = dict(row)
-        reservation = state.get("reservations")
-        if reservation:
-            product = connection.execute(
-                "SELECT id,status,version,restricted FROM products WHERE id=?",
-                (reservation["product_id"],),
-            ).fetchone()
-            state["products"] = dict(product)
+        current = cls.audit_context(connection, object_id)
+        for table, ids in current.items():
+            ids.update((context or {}).get(table, ()))
+            related = {}
+            for record_id in sorted(ids):
+                row = connection.execute(
+                    f"SELECT {columns[table]} FROM {table} WHERE id=?", (record_id,)
+                ).fetchone()
+                if row:
+                    related[record_id] = dict(row)
+            if related:
+                state["related_" + table] = related
+                if table == "products" and "products" not in state:
+                    state["products"] = next(iter(related.values()))
         return state
 
-    def failure(self, actor_id: str | None, action: str, object_id: str, code: str) -> None:
-        """Record a failed operation only after its business transaction rolls back."""
-        with closing(self.database.connect()) as connection:
-            connection.execute("BEGIN IMMEDIATE")
-            self.audit(connection, actor_id, action, object_id, "FAILURE", {"code": code})
-            connection.commit()
+    def failure(self, actor_id, action, object_id, code):
+        """Bound audit lock waits; explicitly signal unpersisted audit without replacing errors."""
+        diagnostic_id = new_id()
+        for attempt in range(2):
+            try:
+                with closing(self.database.connect()) as connection:
+                    connection.execute("PRAGMA busy_timeout=100")
+                    connection.execute("BEGIN IMMEDIATE")
+                    self.audit(
+                        connection,
+                        actor_id,
+                        action,
+                        object_id,
+                        "FAILURE",
+                        {"code": code, "diagnostic_id": diagnostic_id},
+                    )
+                    connection.commit()
+                return {"status": "persisted", "diagnostic_id": diagnostic_id}
+            except sqlite3.Error as exc:
+                error_type = type(exc).__name__
+                if attempt == 0:
+                    time.sleep(0.02)
+        # No SQL, input payload or exception message is included in this diagnostic.
+        LOGGER.error(
+            "AUDIT_UNAVAILABLE %s",
+            json.dumps(
+                {
+                    "diagnostic_id": diagnostic_id,
+                    "action": action,
+                    "object_id": object_id,
+                    "business_code": code,
+                    "audit_exception_type": error_type,
+                },
+                ensure_ascii=False,
+            ),
+        )
+        return {"status": "unavailable", "diagnostic_id": diagnostic_id}
+
+    def failed_error(self, error, actor_id, action, object_id):
+        """Attach truthful audit status while preserving the original business error code."""
+        audit = self.failure(actor_id, action, object_id, error.code)
+        error.audit_status = audit["status"]
+        error.diagnostic_id = audit["diagnostic_id"]
+        return error
 
     def write(
         self,
@@ -112,6 +213,8 @@ class Core:
         admin: bool = False,
     ) -> dict:
         """Serialize business writes; receipts and successful audits commit atomically."""
+        if action in IDEMPOTENT_ACTIONS:
+            required(key, "请求键", 100)
         actor_id = None
         signature = hashlib.sha256(
             json.dumps([action, object_id, payload], sort_keys=True).encode()
@@ -137,14 +240,16 @@ class Core:
                             )
                             connection.commit()
                             return json.loads(previous["result"])
-                    before = self.snapshot(connection, object_id)
+                    context = self.audit_context(connection, object_id)
+                    before = self.snapshot(connection, object_id, context)
                     result = operation(connection, actor)
                     target = object_id or result.get("id", "")
                     detail = {
                         "before": before,
-                        "after": self.snapshot(connection, target),
-                        "result": result,
+                        "after": self.snapshot(connection, target, context),
                     }
+                    if "reason" in result:
+                        detail["reason"] = result["reason"]
                     self.audit(connection, actor.id, action, target, "SUCCESS", detail)
                     if key is not None:
                         connection.execute(
@@ -158,13 +263,28 @@ class Core:
                     connection.rollback()
                     raise
         except MarketError as exc:
-            self.failure(actor_id, action, object_id, exc.code)
+            self.failed_error(exc, actor_id, action, object_id)
             raise
         except sqlite3.Error as exc:
             code = "CONSTRAINT_CONFLICT" if isinstance(exc, sqlite3.IntegrityError) else "DB_ERROR"
-            self.failure(actor_id, action, object_id, code)
-            raise MarketError(code, "数据库操作未生效，请刷新后重试", 503) from exc
+            error = MarketError(code, "数据库操作未生效，请刷新后重试", 503)
+            raise self.failed_error(error, actor_id, action, object_id) from exc
+        except Exception as exc:
+            error = MarketError("INTERNAL_ERROR", "操作未生效，请按诊断编号联系维护人员", 500)
+            self.failed_error(error, actor_id, action, object_id)
+            LOGGER.error(
+                "OPERATION_FAILED %s",
+                json.dumps(
+                    {
+                        "diagnostic_id": error.diagnostic_id,
+                        "action": action,
+                        "exception_type": type(exc).__name__,
+                    }
+                ),
+            )
+            raise error from exc
 
+    @validated
     def register(self, account: str, password: str, bootstrap: bool = False) -> str:
         """Ordinary registration cannot select admin; first-admin bootstrap is local-only."""
         account = required(account, "账号", 60)
@@ -191,6 +311,7 @@ class Core:
                 connection.rollback()
                 raise MarketError("ACCOUNT_EXISTS", "账号已存在", 409) from exc
 
+    @validated
     def create_admin(self, token: str, account: str, password: str) -> dict:
         """An existing authenticated administrator may create another controlled account."""
         account = required(account, "账号", 60)
@@ -206,6 +327,7 @@ class Core:
 
         return self.write(token, "CREATE_ADMIN", account, {}, operation, admin=True)
 
+    @validated
     def login(self, account: str, password: str) -> str:
         """Return a twelve-hour opaque session; disabled accounts cannot sign in."""
         with closing(self.database.connect()) as connection:
@@ -223,11 +345,20 @@ class Core:
             )
             return token
 
+    @validated
     def logout(self, token: str) -> None:
         """Invalidate the current session rather than just hiding CLI state."""
-        with closing(self.database.connect()) as connection:
-            connection.execute("DELETE FROM sessions WHERE token_hash=?", (token_digest(token),))
+        try:
+            with closing(self.database.connect()) as connection:
+                connection.execute(
+                    "DELETE FROM sessions WHERE token_hash=?", (token_digest(token),)
+                )
+        except sqlite3.Error as exc:
+            raise MarketError(
+                "DB_ERROR", "会话注销未持久化，请稍后重试；本地身份已清除", 503
+            ) from exc
 
+    @validated
     def me(self, token: str) -> User:
         """Return current account identity to presentation adapters."""
         with closing(self.database.connect()) as connection:
